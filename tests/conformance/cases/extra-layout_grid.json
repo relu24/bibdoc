@@ -1,0 +1,321 @@
+{
+ "name": "extra-layout_grid",
+ "source": "let layer = choice(\"Layer\", [\"All\", \"Company\", \"Team\"])\nrow(fit: true) {\n  for c in data.cases { badge(c, tone: muted) }\n}\nfor l in data.layers where layer == \"All\" || layer == l {\n  section(l) {\n    grid(columns: 3) {\n      for a in data.actors where a.layer == l {\n        card(a.name, subtitle: a.sub, badge: a.state, badgeTone: a.state == \"open\" ? warning : success, footer: \"**Track:** {a.track}\") {\n          text(a.does)\n          chips(a.laws, tone: muted)\n          if a.verify { chips([\"verify\"], tone: warning) }\n        }\n      }\n    }\n  }\n}\n",
+ "data": {
+  "cases": [
+   "REQ-1",
+   "SPEC 2"
+  ],
+  "layers": [
+   "Company",
+   "Team"
+  ],
+  "actors": [
+   {
+    "layer": "Company",
+    "name": "Legal",
+    "sub": "Contracts",
+    "state": "done",
+    "does": "Says whether a contract is needed.",
+    "laws": [
+     "Policy 3",
+     "Terms of service"
+    ],
+    "track": "not needed (24 Sep)"
+   },
+   {
+    "layer": "Company",
+    "name": "Review board",
+    "sub": "Reviews",
+    "state": "open",
+    "does": "Design review.",
+    "laws": [
+     "Review guide"
+    ],
+    "track": "asked Legal first",
+    "verify": true
+   },
+   {
+    "layer": "Team",
+    "name": "IT",
+    "sub": "Equipment",
+    "state": "open",
+    "does": "Approves equipment.",
+    "laws": [
+     "Policy 7.2"
+    ],
+    "track": "ticket open"
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "cases": [
+     "REQ-1",
+     "SPEC 2"
+    ],
+    "layers": [
+     "Company",
+     "Team"
+    ],
+    "actors": [
+     {
+      "layer": "Company",
+      "name": "Legal",
+      "sub": "Contracts",
+      "state": "done",
+      "does": "Says whether a contract is needed.",
+      "laws": [
+       "Policy 3",
+       "Terms of service"
+      ],
+      "track": "not needed (24 Sep)"
+     },
+     {
+      "layer": "Company",
+      "name": "Review board",
+      "sub": "Reviews",
+      "state": "open",
+      "does": "Design review.",
+      "laws": [
+       "Review guide"
+      ],
+      "track": "asked Legal first",
+      "verify": true
+     },
+     {
+      "layer": "Team",
+      "name": "IT",
+      "sub": "Equipment",
+      "state": "open",
+      "does": "Approves equipment.",
+      "laws": [
+       "Policy 7.2"
+      ],
+      "track": "ticket open"
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Layer",
+      "options": [
+       "All",
+       "Company",
+       "Team"
+      ],
+      "_key": "layer",
+      "value": "All",
+      "children": []
+     },
+     {
+      "type": "row",
+      "fit": true,
+      "children": [
+       {
+        "type": "badge",
+        "text": "REQ-1",
+        "tone": "muted",
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "SPEC 2",
+        "tone": "muted",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Company",
+      "children": [
+       {
+        "type": "grid",
+        "columns": 3,
+        "children": [
+         {
+          "type": "card",
+          "title": "Legal",
+          "subtitle": "Contracts",
+          "badge": "done",
+          "badgeTone": "success",
+          "footer": "**Track:** not needed (24 Sep)",
+          "children": [
+           {
+            "type": "text",
+            "text": "Says whether a contract is needed.",
+            "children": []
+           },
+           {
+            "type": "chips",
+            "items": [
+             "Policy 3",
+             "Terms of service"
+            ],
+            "tone": "muted",
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "card",
+          "title": "Review board",
+          "subtitle": "Reviews",
+          "badge": "open",
+          "badgeTone": "warning",
+          "footer": "**Track:** asked Legal first",
+          "children": [
+           {
+            "type": "text",
+            "text": "Design review.",
+            "children": []
+           },
+           {
+            "type": "chips",
+            "items": [
+             "Review guide"
+            ],
+            "tone": "muted",
+            "children": []
+           },
+           {
+            "type": "chips",
+            "items": [
+             "verify"
+            ],
+            "tone": "warning",
+            "children": []
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Team",
+      "children": [
+       {
+        "type": "grid",
+        "columns": 3,
+        "children": [
+         {
+          "type": "card",
+          "title": "IT",
+          "subtitle": "Equipment",
+          "badge": "open",
+          "badgeTone": "warning",
+          "footer": "**Track:** ticket open",
+          "children": [
+           {
+            "type": "text",
+            "text": "Approves equipment.",
+            "children": []
+           },
+           {
+            "type": "chips",
+            "items": [
+             "Policy 7.2"
+            ],
+            "tone": "muted",
+            "children": []
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "layer",
+   "value": "Team"
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Layer",
+      "options": [
+       "All",
+       "Company",
+       "Team"
+      ],
+      "_key": "layer",
+      "value": "Team",
+      "children": []
+     },
+     {
+      "type": "row",
+      "fit": true,
+      "children": [
+       {
+        "type": "badge",
+        "text": "REQ-1",
+        "tone": "muted",
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "SPEC 2",
+        "tone": "muted",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Team",
+      "children": [
+       {
+        "type": "grid",
+        "columns": 3,
+        "children": [
+         {
+          "type": "card",
+          "title": "IT",
+          "subtitle": "Equipment",
+          "badge": "open",
+          "badgeTone": "warning",
+          "footer": "**Track:** ticket open",
+          "children": [
+           {
+            "type": "text",
+            "text": "Approves equipment.",
+            "children": []
+           },
+           {
+            "type": "chips",
+            "items": [
+             "Policy 7.2"
+            ],
+            "tone": "muted",
+            "children": []
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

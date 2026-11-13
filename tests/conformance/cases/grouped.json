@@ -1,0 +1,137 @@
+{
+ "name": "grouped",
+ "source": "for who in unique(data.issues.map(i => i.assignee)) {\n  section(who) {\n    list(\"Issues\") { for i in data.issues where i.assignee == who { item(i.title, i.title) } }\n  }\n}\n",
+ "data": {
+  "issues": [
+   {
+    "title": "Login loops",
+    "assignee": "Alex"
+   },
+   {
+    "title": "Slow export",
+    "assignee": "Sam"
+   },
+   {
+    "title": "Typo on /quality",
+    "assignee": "Alex"
+   },
+   {
+    "title": "Logo blurry",
+    "assignee": "Kim"
+   },
+   {
+    "title": "Calendar off by one",
+    "assignee": "Sam"
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "issues": [
+     {
+      "title": "Login loops",
+      "assignee": "Alex"
+     },
+     {
+      "title": "Slow export",
+      "assignee": "Sam"
+     },
+     {
+      "title": "Typo on /quality",
+      "assignee": "Alex"
+     },
+     {
+      "title": "Logo blurry",
+      "assignee": "Kim"
+     },
+     {
+      "title": "Calendar off by one",
+      "assignee": "Sam"
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "section",
+      "title": "Alex",
+      "children": [
+       {
+        "type": "list",
+        "label": "Issues",
+        "_key": "issues",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "Login loops",
+          "title": "Login loops",
+          "children": []
+         },
+         {
+          "type": "item",
+          "id": "Typo on /quality",
+          "title": "Typo on /quality",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Sam",
+      "children": [
+       {
+        "type": "list",
+        "label": "Issues",
+        "_key": "issues",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "Slow export",
+          "title": "Slow export",
+          "children": []
+         },
+         {
+          "type": "item",
+          "id": "Calendar off by one",
+          "title": "Calendar off by one",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Kim",
+      "children": [
+       {
+        "type": "list",
+        "label": "Issues",
+        "_key": "issues",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "Logo blurry",
+          "title": "Logo blurry",
+          "children": []
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

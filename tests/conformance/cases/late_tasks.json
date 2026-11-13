@@ -1,0 +1,235 @@
+{
+ "name": "late_tasks",
+ "source": "for p in data.projects {\n  let open = p.tasks.filter(t => !t.done)\n  let late = open.count(t => t.due < data.today)\n  card(p.name) {\n    if late > 0 { badge(\"{late} late\", tone: \"danger\") } else { badge(\"on track\", tone: \"success\") }\n    list(\"Tasks\") {\n      for t in open {\n        if t.due < data.today { item(t.title, t.title, badge: \"late\", tone: \"danger\") } else { item(t.title, t.title) }\n      }\n    }\n    if late > 0 {\n      if button(\"Nudge\").clicked { send(\"Nudge: {p.name} ({late} late)\") }\n    }\n  }\n}\n",
+ "data": {
+  "today": "2026-11-12",
+  "projects": [
+   {
+    "name": "Website",
+    "tasks": [
+     {
+      "title": "Ship /docs",
+      "due": "2026-11-20",
+      "done": false
+     },
+     {
+      "title": "Fix DEF-8",
+      "due": "2026-11-01",
+      "done": false
+     },
+     {
+      "title": "Revise SW-01",
+      "due": "2026-10-30",
+      "done": true
+     }
+    ]
+   },
+   {
+    "name": "Research",
+    "tasks": [
+     {
+      "title": "Review form",
+      "due": "2026-11-05",
+      "done": false
+     },
+     {
+      "title": "Book the lab",
+      "due": "2026-11-10",
+      "done": false
+     }
+    ]
+   },
+   {
+    "name": "Brand",
+    "tasks": [
+     {
+      "title": "New deck",
+      "due": "2026-12-01",
+      "done": false
+     }
+    ]
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "today": "2026-11-12",
+    "projects": [
+     {
+      "name": "Website",
+      "tasks": [
+       {
+        "title": "Ship /docs",
+        "due": "2026-11-20",
+        "done": false
+       },
+       {
+        "title": "Fix DEF-8",
+        "due": "2026-11-01",
+        "done": false
+       },
+       {
+        "title": "Revise SW-01",
+        "due": "2026-10-30",
+        "done": true
+       }
+      ]
+     },
+     {
+      "name": "Research",
+      "tasks": [
+       {
+        "title": "Review form",
+        "due": "2026-11-05",
+        "done": false
+       },
+       {
+        "title": "Book the lab",
+        "due": "2026-11-10",
+        "done": false
+       }
+      ]
+     },
+     {
+      "name": "Brand",
+      "tasks": [
+       {
+        "title": "New deck",
+        "due": "2026-12-01",
+        "done": false
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "card",
+      "title": "Website",
+      "children": [
+       {
+        "type": "badge",
+        "text": "1 late",
+        "tone": "danger",
+        "children": []
+       },
+       {
+        "type": "list",
+        "label": "Tasks",
+        "_key": "tasks",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "Ship /docs",
+          "title": "Ship /docs",
+          "children": []
+         },
+         {
+          "type": "item",
+          "id": "Fix DEF-8",
+          "title": "Fix DEF-8",
+          "badge": "late",
+          "tone": "danger",
+          "children": []
+         }
+        ]
+       },
+       {
+        "type": "button",
+        "label": "Nudge",
+        "_key": "nudge#0",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Research",
+      "children": [
+       {
+        "type": "badge",
+        "text": "2 late",
+        "tone": "danger",
+        "children": []
+       },
+       {
+        "type": "list",
+        "label": "Tasks",
+        "_key": "tasks",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "Review form",
+          "title": "Review form",
+          "badge": "late",
+          "tone": "danger",
+          "children": []
+         },
+         {
+          "type": "item",
+          "id": "Book the lab",
+          "title": "Book the lab",
+          "badge": "late",
+          "tone": "danger",
+          "children": []
+         }
+        ]
+       },
+       {
+        "type": "button",
+        "label": "Nudge",
+        "_key": "nudge#1",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Brand",
+      "children": [
+       {
+        "type": "badge",
+        "text": "on track",
+        "tone": "success",
+        "children": []
+       },
+       {
+        "type": "list",
+        "label": "Tasks",
+        "_key": "tasks",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "New deck",
+          "title": "New deck",
+          "children": []
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "op": "click",
+   "key": "nudge#1",
+   "effects": [
+    {
+     "kind": "send",
+     "text": "Nudge: Research (2 late)"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,95 @@
+{
+ "name": "send_message",
+ "source": "let note = input(\"Note\")\nlet p = choice(\"Priority\", [\"low\", \"high\"])\nif button(\"Send\").clicked { send(\"Priority {p}: {note}\") }\n",
+ "data": {},
+ "steps": [
+  {
+   "op": "session",
+   "data": {}
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "input",
+      "label": "Note",
+      "_key": "note",
+      "value": "",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Priority",
+      "options": [
+       "low",
+       "high"
+      ],
+      "_key": "priority",
+      "value": "low",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Send",
+      "_key": "send#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "note",
+   "value": "call Robin"
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "input",
+      "label": "Note",
+      "_key": "note",
+      "value": "call Robin",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Priority",
+      "options": [
+       "low",
+       "high"
+      ],
+      "_key": "priority",
+      "value": "low",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Send",
+      "_key": "send#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "priority",
+   "value": "high"
+  },
+  {
+   "op": "click",
+   "key": "send#0",
+   "effects": [
+    {
+     "kind": "send",
+     "text": "Priority high: call Robin"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,473 @@
+{
+ "name": "dashboard",
+ "source": "heading(\"Receipts\")\nrow {\n  stat(\"Open\", data.receipts.count(r => r.status == \"open\"))\n  stat(\"Approved\", data.receipts.count(r => r.status == \"approved\"))\n  stat(\"Amount\", data.receipts.sum(r => r.amount))\n}\nlet status = choice(\"Status\", [\"all\", \"open\", \"approved\"])\nlet shown = data.receipts.filter(r => status == \"all\" || r.status == status)\nlet picked = list(\"Receipts\", selectable: true) {\n  for r in shown { item(r.id, \"{r.id} · {r.amount} EUR\") }\n}\nif button(\"Approve\", disabled: picked.selected.length == 0).clicked { call(\"shop.receipts_approve\", ids: picked.selected) }\nif button(\"Export\").clicked { send(\"Export {status} ({shown.length} receipts)\") }\n",
+ "data": {
+  "receipts": [
+   {
+    "id": "r1",
+    "status": "open",
+    "amount": 1200
+   },
+   {
+    "id": "r2",
+    "status": "approved",
+    "amount": 300
+   },
+   {
+    "id": "r3",
+    "status": "open",
+    "amount": 75
+   },
+   {
+    "id": "r4",
+    "status": "approved",
+    "amount": 990
+   },
+   {
+    "id": "r5",
+    "status": "approved",
+    "amount": 45
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "receipts": [
+     {
+      "id": "r1",
+      "status": "open",
+      "amount": 1200
+     },
+     {
+      "id": "r2",
+      "status": "approved",
+      "amount": 300
+     },
+     {
+      "id": "r3",
+      "status": "open",
+      "amount": 75
+     },
+     {
+      "id": "r4",
+      "status": "approved",
+      "amount": 990
+     },
+     {
+      "id": "r5",
+      "status": "approved",
+      "amount": 45
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "heading",
+      "text": "Receipts",
+      "children": []
+     },
+     {
+      "type": "row",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Open",
+        "value": 2,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Approved",
+        "value": 3,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Amount",
+        "value": 2610,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Status",
+      "options": [
+       "all",
+       "open",
+       "approved"
+      ],
+      "_key": "status",
+      "value": "all",
+      "children": []
+     },
+     {
+      "type": "list",
+      "label": "Receipts",
+      "selectable": true,
+      "_key": "receipts",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "r1",
+        "title": "r1 · 1200 EUR",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "r2",
+        "title": "r2 · 300 EUR",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "r3",
+        "title": "r3 · 75 EUR",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "r4",
+        "title": "r4 · 990 EUR",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "r5",
+        "title": "r5 · 45 EUR",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Approve",
+      "disabled": true,
+      "_key": "approve#0",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Export",
+      "_key": "export#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "heading",
+      "text": "Receipts",
+      "children": []
+     },
+     {
+      "type": "row",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Open",
+        "value": 2,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Approved",
+        "value": 3,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Amount",
+        "value": 2610,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Status",
+      "options": [
+       "all",
+       "open",
+       "approved"
+      ],
+      "_key": "status",
+      "value": "all",
+      "children": []
+     },
+     {
+      "type": "list",
+      "label": "Receipts",
+      "selectable": true,
+      "_key": "receipts",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "r1",
+        "title": "r1 · 1200 EUR",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "r2",
+        "title": "r2 · 300 EUR",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "r3",
+        "title": "r3 · 75 EUR",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "r4",
+        "title": "r4 · 990 EUR",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "r5",
+        "title": "r5 · 45 EUR",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Approve",
+      "disabled": true,
+      "_key": "approve#0",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Export",
+      "_key": "export#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "status",
+   "value": "open"
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "heading",
+      "text": "Receipts",
+      "children": []
+     },
+     {
+      "type": "row",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Open",
+        "value": 2,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Approved",
+        "value": 3,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Amount",
+        "value": 2610,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Status",
+      "options": [
+       "all",
+       "open",
+       "approved"
+      ],
+      "_key": "status",
+      "value": "open",
+      "children": []
+     },
+     {
+      "type": "list",
+      "label": "Receipts",
+      "selectable": true,
+      "_key": "receipts",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "r1",
+        "title": "r1 · 1200 EUR",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "r3",
+        "title": "r3 · 75 EUR",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Approve",
+      "disabled": true,
+      "_key": "approve#0",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Export",
+      "_key": "export#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "click",
+   "key": "approve#0",
+   "effects": []
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "heading",
+      "text": "Receipts",
+      "children": []
+     },
+     {
+      "type": "row",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Open",
+        "value": 2,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Approved",
+        "value": 3,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Amount",
+        "value": 2610,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Status",
+      "options": [
+       "all",
+       "open",
+       "approved"
+      ],
+      "_key": "status",
+      "value": "open",
+      "children": []
+     },
+     {
+      "type": "list",
+      "label": "Receipts",
+      "selectable": true,
+      "_key": "receipts",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "r1",
+        "title": "r1 · 1200 EUR",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "r3",
+        "title": "r3 · 75 EUR",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Approve",
+      "disabled": true,
+      "_key": "approve#0",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Export",
+      "_key": "export#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "receipts",
+   "value": [
+    "r3"
+   ]
+  },
+  {
+   "op": "click",
+   "key": "approve#0",
+   "effects": [
+    {
+     "kind": "call",
+     "tool": "shop.receipts_approve",
+     "args": {
+      "ids": [
+       "r3"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "op": "click",
+   "key": "export#0",
+   "effects": [
+    {
+     "kind": "send",
+     "text": "Export open (2 receipts)"
+    }
+   ]
+  }
+ ]
+}

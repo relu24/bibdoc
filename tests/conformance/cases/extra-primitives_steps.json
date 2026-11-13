@@ -1,0 +1,931 @@
+{
+ "name": "extra-primitives_steps",
+ "source": "// The workflow's steps, written from primitives: no steps or step widget, only box, text and a layer.\nlet tone = k => k == \"done\" ? success : k == \"watch\" ? danger : k == \"open\" ? warning : muted\n\nfn pill(label, tone: muted) {\n  box(padding: [4, 12], radius: 9999, background: fade(tone, 0.16)) {\n    text(label, size: sm, color: tone)\n  }\n}\n\nfn chips(items, tone: null) {\n  box(dir: \"row\", wrap: true, gap: 6) {\n    for c in items {\n      box(padding: [2, 7], radius: 5, background: fade(tone ?? accent, 0.14)) {\n        text(c, size: sm, face: mono, color: tone ?? accent)\n      }\n    }\n  }\n}\n\nfn flow(items) {\n  let phase = null\n  box(component: \"steps\") {\n    for s in items {\n      let i = index\n      if s.phase && s.phase != phase {\n        if i > 0 { box(height: 12) }\n        text(s.phase, size: sm, face: mono, caps: true, color: accent)\n        phase = s.phase\n      }\n      let last = i == items.length - 1 || items[i + 1].phase != s.phase\n      let ring = tone(s.kind)\n      box(dir: \"row\", gap: 10, padding: [0, 0, last ? 0 : 12, 0]) {\n        if !last { layer { line(12, 28, 12, h, color: border, width: 1.5) } }\n        box(width: 24, height: 24, radius: 12, border: 1.5, borderColor: ring,\n            background: fade(ring, 0.12), align: center, justify: center) {\n          text(str(s.n), size: sm, weight: bold, color: ring)\n        }\n        box(width: fill, gap: 4) {\n          box(dir: \"row\", align: start, gap: 8) {\n            text(s.title, weight: bold, width: fill)\n            if s.status { pill(s.status, tone: ring) }\n          }\n          if s.who { text(s.who, size: sm, color: muted) }\n          slot(s)\n        }\n      }\n    }\n  }\n}\n\nlet show = choice(\"Show\", [\"Every step\", \"Only open\"])\nflow(data.steps.filter(s => show == \"Every step\" || s.kind != \"done\")) {\n  if it.refs { chips(it.refs) }\n  if it.note { text(it.note) }\n}\n",
+ "data": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Write the plan",
+    "status": "v2 · 3 Mar",
+    "kind": "done",
+    "who": "Eva, with the team",
+    "phase": "Prepare",
+    "note": "One version, frozen before the review."
+   },
+   {
+    "n": 2,
+    "title": "Check the rules that apply",
+    "status": "Yes · 10 Mar",
+    "kind": "done",
+    "who": "The advisory office",
+    "phase": "Prepare",
+    "refs": [
+     "Rule 4.2"
+    ]
+   },
+   {
+    "n": 3,
+    "title": "Committee question answered",
+    "status": "Q-12",
+    "kind": "open",
+    "who": "The committee",
+    "phase": "Approve",
+    "note": "Confirm it is closed."
+   },
+   {
+    "n": 4,
+    "title": "Equipment approved",
+    "status": "open · EQ-77",
+    "kind": "watch",
+    "who": "Facilities",
+    "phase": "Approve"
+   },
+   {
+    "n": 5,
+    "title": "Collect, check, hand over",
+    "kind": "plan",
+    "who": "Team, partner",
+    "phase": "Run"
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "steps": [
+     {
+      "n": 1,
+      "title": "Write the plan",
+      "status": "v2 · 3 Mar",
+      "kind": "done",
+      "who": "Eva, with the team",
+      "phase": "Prepare",
+      "note": "One version, frozen before the review."
+     },
+     {
+      "n": 2,
+      "title": "Check the rules that apply",
+      "status": "Yes · 10 Mar",
+      "kind": "done",
+      "who": "The advisory office",
+      "phase": "Prepare",
+      "refs": [
+       "Rule 4.2"
+      ]
+     },
+     {
+      "n": 3,
+      "title": "Committee question answered",
+      "status": "Q-12",
+      "kind": "open",
+      "who": "The committee",
+      "phase": "Approve",
+      "note": "Confirm it is closed."
+     },
+     {
+      "n": 4,
+      "title": "Equipment approved",
+      "status": "open · EQ-77",
+      "kind": "watch",
+      "who": "Facilities",
+      "phase": "Approve"
+     },
+     {
+      "n": 5,
+      "title": "Collect, check, hand over",
+      "kind": "plan",
+      "who": "Team, partner",
+      "phase": "Run"
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Show",
+      "options": [
+       "Every step",
+       "Only open"
+      ],
+      "_key": "show",
+      "value": "Every step",
+      "children": []
+     },
+     {
+      "type": "box",
+      "component": "steps",
+      "children": [
+       {
+        "type": "text",
+        "text": "Prepare",
+        "size": "sm",
+        "face": "mono",
+        "caps": true,
+        "color": "accent",
+        "children": []
+       },
+       {
+        "type": "box",
+        "dir": "row",
+        "gap": 10,
+        "padding": [
+         0,
+         0,
+         12,
+         0
+        ],
+        "children": [
+         {
+          "type": "layer",
+          "children": [
+           {
+            "type": "line",
+            "x1": 12,
+            "y1": 28,
+            "x2": 12,
+            "y2": {
+             "dim": "h",
+             "k": 1,
+             "c": 0
+            },
+            "color": "border",
+            "width": 1.5,
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "box",
+          "width": 24,
+          "height": 24,
+          "radius": 12,
+          "border": 1.5,
+          "borderColor": "success",
+          "background": "success@0.12",
+          "align": "center",
+          "justify": "center",
+          "children": [
+           {
+            "type": "text",
+            "text": "1",
+            "size": "sm",
+            "weight": "bold",
+            "color": "success",
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "box",
+          "width": "fill",
+          "gap": 4,
+          "children": [
+           {
+            "type": "box",
+            "dir": "row",
+            "align": "start",
+            "gap": 8,
+            "children": [
+             {
+              "type": "text",
+              "text": "Write the plan",
+              "weight": "bold",
+              "width": "fill",
+              "children": []
+             },
+             {
+              "type": "box",
+              "padding": [
+               4,
+               12
+              ],
+              "radius": 9999,
+              "background": "success@0.16",
+              "children": [
+               {
+                "type": "text",
+                "text": "v2 · 3 Mar",
+                "size": "sm",
+                "color": "success",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "text",
+            "text": "Eva, with the team",
+            "size": "sm",
+            "color": "muted",
+            "children": []
+           },
+           {
+            "type": "text",
+            "text": "One version, frozen before the review.",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "type": "box",
+        "dir": "row",
+        "gap": 10,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "children": [
+         {
+          "type": "box",
+          "width": 24,
+          "height": 24,
+          "radius": 12,
+          "border": 1.5,
+          "borderColor": "success",
+          "background": "success@0.12",
+          "align": "center",
+          "justify": "center",
+          "children": [
+           {
+            "type": "text",
+            "text": "2",
+            "size": "sm",
+            "weight": "bold",
+            "color": "success",
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "box",
+          "width": "fill",
+          "gap": 4,
+          "children": [
+           {
+            "type": "box",
+            "dir": "row",
+            "align": "start",
+            "gap": 8,
+            "children": [
+             {
+              "type": "text",
+              "text": "Check the rules that apply",
+              "weight": "bold",
+              "width": "fill",
+              "children": []
+             },
+             {
+              "type": "box",
+              "padding": [
+               4,
+               12
+              ],
+              "radius": 9999,
+              "background": "success@0.16",
+              "children": [
+               {
+                "type": "text",
+                "text": "Yes · 10 Mar",
+                "size": "sm",
+                "color": "success",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "text",
+            "text": "The advisory office",
+            "size": "sm",
+            "color": "muted",
+            "children": []
+           },
+           {
+            "type": "box",
+            "dir": "row",
+            "wrap": true,
+            "gap": 6,
+            "children": [
+             {
+              "type": "box",
+              "padding": [
+               2,
+               7
+              ],
+              "radius": 5,
+              "background": "accent@0.14",
+              "children": [
+               {
+                "type": "text",
+                "text": "Rule 4.2",
+                "size": "sm",
+                "face": "mono",
+                "color": "accent",
+                "children": []
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "type": "box",
+        "height": 12,
+        "children": []
+       },
+       {
+        "type": "text",
+        "text": "Approve",
+        "size": "sm",
+        "face": "mono",
+        "caps": true,
+        "color": "accent",
+        "children": []
+       },
+       {
+        "type": "box",
+        "dir": "row",
+        "gap": 10,
+        "padding": [
+         0,
+         0,
+         12,
+         0
+        ],
+        "children": [
+         {
+          "type": "layer",
+          "children": [
+           {
+            "type": "line",
+            "x1": 12,
+            "y1": 28,
+            "x2": 12,
+            "y2": {
+             "dim": "h",
+             "k": 1,
+             "c": 0
+            },
+            "color": "border",
+            "width": 1.5,
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "box",
+          "width": 24,
+          "height": 24,
+          "radius": 12,
+          "border": 1.5,
+          "borderColor": "warning",
+          "background": "warning@0.12",
+          "align": "center",
+          "justify": "center",
+          "children": [
+           {
+            "type": "text",
+            "text": "3",
+            "size": "sm",
+            "weight": "bold",
+            "color": "warning",
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "box",
+          "width": "fill",
+          "gap": 4,
+          "children": [
+           {
+            "type": "box",
+            "dir": "row",
+            "align": "start",
+            "gap": 8,
+            "children": [
+             {
+              "type": "text",
+              "text": "Committee question answered",
+              "weight": "bold",
+              "width": "fill",
+              "children": []
+             },
+             {
+              "type": "box",
+              "padding": [
+               4,
+               12
+              ],
+              "radius": 9999,
+              "background": "warning@0.16",
+              "children": [
+               {
+                "type": "text",
+                "text": "Q-12",
+                "size": "sm",
+                "color": "warning",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "text",
+            "text": "The committee",
+            "size": "sm",
+            "color": "muted",
+            "children": []
+           },
+           {
+            "type": "text",
+            "text": "Confirm it is closed.",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "type": "box",
+        "dir": "row",
+        "gap": 10,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "children": [
+         {
+          "type": "box",
+          "width": 24,
+          "height": 24,
+          "radius": 12,
+          "border": 1.5,
+          "borderColor": "danger",
+          "background": "danger@0.12",
+          "align": "center",
+          "justify": "center",
+          "children": [
+           {
+            "type": "text",
+            "text": "4",
+            "size": "sm",
+            "weight": "bold",
+            "color": "danger",
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "box",
+          "width": "fill",
+          "gap": 4,
+          "children": [
+           {
+            "type": "box",
+            "dir": "row",
+            "align": "start",
+            "gap": 8,
+            "children": [
+             {
+              "type": "text",
+              "text": "Equipment approved",
+              "weight": "bold",
+              "width": "fill",
+              "children": []
+             },
+             {
+              "type": "box",
+              "padding": [
+               4,
+               12
+              ],
+              "radius": 9999,
+              "background": "danger@0.16",
+              "children": [
+               {
+                "type": "text",
+                "text": "open · EQ-77",
+                "size": "sm",
+                "color": "danger",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "text",
+            "text": "Facilities",
+            "size": "sm",
+            "color": "muted",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "type": "box",
+        "height": 12,
+        "children": []
+       },
+       {
+        "type": "text",
+        "text": "Run",
+        "size": "sm",
+        "face": "mono",
+        "caps": true,
+        "color": "accent",
+        "children": []
+       },
+       {
+        "type": "box",
+        "dir": "row",
+        "gap": 10,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "children": [
+         {
+          "type": "box",
+          "width": 24,
+          "height": 24,
+          "radius": 12,
+          "border": 1.5,
+          "borderColor": "muted",
+          "background": "muted@0.12",
+          "align": "center",
+          "justify": "center",
+          "children": [
+           {
+            "type": "text",
+            "text": "5",
+            "size": "sm",
+            "weight": "bold",
+            "color": "muted",
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "box",
+          "width": "fill",
+          "gap": 4,
+          "children": [
+           {
+            "type": "box",
+            "dir": "row",
+            "align": "start",
+            "gap": 8,
+            "children": [
+             {
+              "type": "text",
+              "text": "Collect, check, hand over",
+              "weight": "bold",
+              "width": "fill",
+              "children": []
+             }
+            ]
+           },
+           {
+            "type": "text",
+            "text": "Team, partner",
+            "size": "sm",
+            "color": "muted",
+            "children": []
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "show",
+   "value": "Only open"
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Show",
+      "options": [
+       "Every step",
+       "Only open"
+      ],
+      "_key": "show",
+      "value": "Only open",
+      "children": []
+     },
+     {
+      "type": "box",
+      "component": "steps",
+      "children": [
+       {
+        "type": "text",
+        "text": "Approve",
+        "size": "sm",
+        "face": "mono",
+        "caps": true,
+        "color": "accent",
+        "children": []
+       },
+       {
+        "type": "box",
+        "dir": "row",
+        "gap": 10,
+        "padding": [
+         0,
+         0,
+         12,
+         0
+        ],
+        "children": [
+         {
+          "type": "layer",
+          "children": [
+           {
+            "type": "line",
+            "x1": 12,
+            "y1": 28,
+            "x2": 12,
+            "y2": {
+             "dim": "h",
+             "k": 1,
+             "c": 0
+            },
+            "color": "border",
+            "width": 1.5,
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "box",
+          "width": 24,
+          "height": 24,
+          "radius": 12,
+          "border": 1.5,
+          "borderColor": "warning",
+          "background": "warning@0.12",
+          "align": "center",
+          "justify": "center",
+          "children": [
+           {
+            "type": "text",
+            "text": "3",
+            "size": "sm",
+            "weight": "bold",
+            "color": "warning",
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "box",
+          "width": "fill",
+          "gap": 4,
+          "children": [
+           {
+            "type": "box",
+            "dir": "row",
+            "align": "start",
+            "gap": 8,
+            "children": [
+             {
+              "type": "text",
+              "text": "Committee question answered",
+              "weight": "bold",
+              "width": "fill",
+              "children": []
+             },
+             {
+              "type": "box",
+              "padding": [
+               4,
+               12
+              ],
+              "radius": 9999,
+              "background": "warning@0.16",
+              "children": [
+               {
+                "type": "text",
+                "text": "Q-12",
+                "size": "sm",
+                "color": "warning",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "text",
+            "text": "The committee",
+            "size": "sm",
+            "color": "muted",
+            "children": []
+           },
+           {
+            "type": "text",
+            "text": "Confirm it is closed.",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "type": "box",
+        "dir": "row",
+        "gap": 10,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "children": [
+         {
+          "type": "box",
+          "width": 24,
+          "height": 24,
+          "radius": 12,
+          "border": 1.5,
+          "borderColor": "danger",
+          "background": "danger@0.12",
+          "align": "center",
+          "justify": "center",
+          "children": [
+           {
+            "type": "text",
+            "text": "4",
+            "size": "sm",
+            "weight": "bold",
+            "color": "danger",
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "box",
+          "width": "fill",
+          "gap": 4,
+          "children": [
+           {
+            "type": "box",
+            "dir": "row",
+            "align": "start",
+            "gap": 8,
+            "children": [
+             {
+              "type": "text",
+              "text": "Equipment approved",
+              "weight": "bold",
+              "width": "fill",
+              "children": []
+             },
+             {
+              "type": "box",
+              "padding": [
+               4,
+               12
+              ],
+              "radius": 9999,
+              "background": "danger@0.16",
+              "children": [
+               {
+                "type": "text",
+                "text": "open · EQ-77",
+                "size": "sm",
+                "color": "danger",
+                "children": []
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "text",
+            "text": "Facilities",
+            "size": "sm",
+            "color": "muted",
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "type": "box",
+        "height": 12,
+        "children": []
+       },
+       {
+        "type": "text",
+        "text": "Run",
+        "size": "sm",
+        "face": "mono",
+        "caps": true,
+        "color": "accent",
+        "children": []
+       },
+       {
+        "type": "box",
+        "dir": "row",
+        "gap": 10,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "children": [
+         {
+          "type": "box",
+          "width": 24,
+          "height": 24,
+          "radius": 12,
+          "border": 1.5,
+          "borderColor": "muted",
+          "background": "muted@0.12",
+          "align": "center",
+          "justify": "center",
+          "children": [
+           {
+            "type": "text",
+            "text": "5",
+            "size": "sm",
+            "weight": "bold",
+            "color": "muted",
+            "children": []
+           }
+          ]
+         },
+         {
+          "type": "box",
+          "width": "fill",
+          "gap": 4,
+          "children": [
+           {
+            "type": "box",
+            "dir": "row",
+            "align": "start",
+            "gap": 8,
+            "children": [
+             {
+              "type": "text",
+              "text": "Collect, check, hand over",
+              "weight": "bold",
+              "width": "fill",
+              "children": []
+             }
+            ]
+           },
+           {
+            "type": "text",
+            "text": "Team, partner",
+            "size": "sm",
+            "color": "muted",
+            "children": []
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

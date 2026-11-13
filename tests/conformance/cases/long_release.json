@@ -1,0 +1,607 @@
+{
+ "name": "long_release",
+ "source": "let r = data.release\nlet cs = data.changes\ncard(\"Release {r.version}\", subtitle: r.date) {\n  kv([{label: \"Features\", value: cs.count(c => c.kind == \"feature\")},\n      {label: \"Fixes\", value: cs.count(c => c.kind == \"fix\")},\n      {label: \"Chores\", value: cs.count(c => c.kind == \"chore\")}])\n  let hide = toggle(\"Hide chores\", value: true)\n  let shown = cs.filter(c => !hide || c.kind != \"chore\")\n  table([\"Change\", \"Kind\", \"Risk\", \"Tested\"], shown.map(c => [c.title, c.kind, c.risk, c.tested ? \"yes\" : \"no\"]))\n  progress(\"Tested\", shown.count(c => c.tested), max: shown.length)\n  let blockers = shown.filter(c => c.risk == \"high\" && !c.tested)\n  if blockers.length > 0 {\n    badge(\"blocked\", tone: danger)\n    list(\"Blockers\") { for b in blockers { item(b.id, b.title) } }\n  } else {\n    badge(\"ready\", tone: success)\n    if button(\"Ship\").clicked { respond(version: r.version, shipped: shown.map(c => c.id)) }\n  }\n}\n",
+ "data": {
+  "release": {
+   "version": "2.5",
+   "date": "2026-11-20"
+  },
+  "changes": [
+   {
+    "id": "c1",
+    "title": "Docs section",
+    "kind": "feature",
+    "risk": "high",
+    "tested": true
+   },
+   {
+    "id": "c2",
+    "title": "Fix DEF-8",
+    "kind": "fix",
+    "risk": "low",
+    "tested": true
+   },
+   {
+    "id": "c3",
+    "title": "Bump deps",
+    "kind": "chore",
+    "risk": "low",
+    "tested": false
+   },
+   {
+    "id": "c4",
+    "title": "Approval covers diff",
+    "kind": "feature",
+    "risk": "high",
+    "tested": false
+   },
+   {
+    "id": "c5",
+    "title": "Typo",
+    "kind": "fix",
+    "risk": "low",
+    "tested": false
+   },
+   {
+    "id": "c6",
+    "title": "CI cache",
+    "kind": "chore",
+    "risk": "high",
+    "tested": false
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "release": {
+     "version": "2.5",
+     "date": "2026-11-20"
+    },
+    "changes": [
+     {
+      "id": "c1",
+      "title": "Docs section",
+      "kind": "feature",
+      "risk": "high",
+      "tested": true
+     },
+     {
+      "id": "c2",
+      "title": "Fix DEF-8",
+      "kind": "fix",
+      "risk": "low",
+      "tested": true
+     },
+     {
+      "id": "c3",
+      "title": "Bump deps",
+      "kind": "chore",
+      "risk": "low",
+      "tested": false
+     },
+     {
+      "id": "c4",
+      "title": "Approval covers diff",
+      "kind": "feature",
+      "risk": "high",
+      "tested": false
+     },
+     {
+      "id": "c5",
+      "title": "Typo",
+      "kind": "fix",
+      "risk": "low",
+      "tested": false
+     },
+     {
+      "id": "c6",
+      "title": "CI cache",
+      "kind": "chore",
+      "risk": "high",
+      "tested": false
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "card",
+      "title": "Release 2.5",
+      "subtitle": "2026-11-20",
+      "children": [
+       {
+        "type": "kv",
+        "items": [
+         {
+          "label": "Features",
+          "value": 2
+         },
+         {
+          "label": "Fixes",
+          "value": 2
+         },
+         {
+          "label": "Chores",
+          "value": 2
+         }
+        ],
+        "children": []
+       },
+       {
+        "type": "toggle",
+        "label": "Hide chores",
+        "value": true,
+        "_key": "hidechores",
+        "children": []
+       },
+       {
+        "type": "table",
+        "columns": [
+         "Change",
+         "Kind",
+         "Risk",
+         "Tested"
+        ],
+        "rows": [
+         [
+          "Docs section",
+          "feature",
+          "high",
+          "yes"
+         ],
+         [
+          "Fix DEF-8",
+          "fix",
+          "low",
+          "yes"
+         ],
+         [
+          "Approval covers diff",
+          "feature",
+          "high",
+          "no"
+         ],
+         [
+          "Typo",
+          "fix",
+          "low",
+          "no"
+         ]
+        ],
+        "children": []
+       },
+       {
+        "type": "progress",
+        "label": "Tested",
+        "value": 2,
+        "max": 4,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "blocked",
+        "tone": "danger",
+        "children": []
+       },
+       {
+        "type": "list",
+        "label": "Blockers",
+        "_key": "blockers",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "c4",
+          "title": "Approval covers diff",
+          "children": []
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "card",
+      "title": "Release 2.5",
+      "subtitle": "2026-11-20",
+      "children": [
+       {
+        "type": "kv",
+        "items": [
+         {
+          "label": "Features",
+          "value": 2
+         },
+         {
+          "label": "Fixes",
+          "value": 2
+         },
+         {
+          "label": "Chores",
+          "value": 2
+         }
+        ],
+        "children": []
+       },
+       {
+        "type": "toggle",
+        "label": "Hide chores",
+        "value": true,
+        "_key": "hidechores",
+        "children": []
+       },
+       {
+        "type": "table",
+        "columns": [
+         "Change",
+         "Kind",
+         "Risk",
+         "Tested"
+        ],
+        "rows": [
+         [
+          "Docs section",
+          "feature",
+          "high",
+          "yes"
+         ],
+         [
+          "Fix DEF-8",
+          "fix",
+          "low",
+          "yes"
+         ],
+         [
+          "Approval covers diff",
+          "feature",
+          "high",
+          "no"
+         ],
+         [
+          "Typo",
+          "fix",
+          "low",
+          "no"
+         ]
+        ],
+        "children": []
+       },
+       {
+        "type": "progress",
+        "label": "Tested",
+        "value": 2,
+        "max": 4,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "blocked",
+        "tone": "danger",
+        "children": []
+       },
+       {
+        "type": "list",
+        "label": "Blockers",
+        "_key": "blockers",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "c4",
+          "title": "Approval covers diff",
+          "children": []
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "hidechores",
+   "value": false
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "card",
+      "title": "Release 2.5",
+      "subtitle": "2026-11-20",
+      "children": [
+       {
+        "type": "kv",
+        "items": [
+         {
+          "label": "Features",
+          "value": 2
+         },
+         {
+          "label": "Fixes",
+          "value": 2
+         },
+         {
+          "label": "Chores",
+          "value": 2
+         }
+        ],
+        "children": []
+       },
+       {
+        "type": "toggle",
+        "label": "Hide chores",
+        "value": false,
+        "_key": "hidechores",
+        "children": []
+       },
+       {
+        "type": "table",
+        "columns": [
+         "Change",
+         "Kind",
+         "Risk",
+         "Tested"
+        ],
+        "rows": [
+         [
+          "Docs section",
+          "feature",
+          "high",
+          "yes"
+         ],
+         [
+          "Fix DEF-8",
+          "fix",
+          "low",
+          "yes"
+         ],
+         [
+          "Bump deps",
+          "chore",
+          "low",
+          "no"
+         ],
+         [
+          "Approval covers diff",
+          "feature",
+          "high",
+          "no"
+         ],
+         [
+          "Typo",
+          "fix",
+          "low",
+          "no"
+         ],
+         [
+          "CI cache",
+          "chore",
+          "high",
+          "no"
+         ]
+        ],
+        "children": []
+       },
+       {
+        "type": "progress",
+        "label": "Tested",
+        "value": 2,
+        "max": 6,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "blocked",
+        "tone": "danger",
+        "children": []
+       },
+       {
+        "type": "list",
+        "label": "Blockers",
+        "_key": "blockers",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "c4",
+          "title": "Approval covers diff",
+          "children": []
+         },
+         {
+          "type": "item",
+          "id": "c6",
+          "title": "CI cache",
+          "children": []
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "op": "session",
+   "data": {
+    "release": {
+     "version": "2.5",
+     "date": "2026-11-20"
+    },
+    "changes": [
+     {
+      "id": "c1",
+      "title": "Docs section",
+      "kind": "feature",
+      "risk": "high",
+      "tested": true
+     },
+     {
+      "id": "c2",
+      "title": "Fix DEF-8",
+      "kind": "fix",
+      "risk": "low",
+      "tested": true
+     },
+     {
+      "id": "c3",
+      "title": "Bump deps",
+      "kind": "chore",
+      "risk": "low",
+      "tested": false
+     },
+     {
+      "id": "c4",
+      "title": "Approval covers diff",
+      "kind": "feature",
+      "risk": "high",
+      "tested": true
+     },
+     {
+      "id": "c5",
+      "title": "Typo",
+      "kind": "fix",
+      "risk": "low",
+      "tested": false
+     },
+     {
+      "id": "c6",
+      "title": "CI cache",
+      "kind": "chore",
+      "risk": "high",
+      "tested": false
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "card",
+      "title": "Release 2.5",
+      "subtitle": "2026-11-20",
+      "children": [
+       {
+        "type": "kv",
+        "items": [
+         {
+          "label": "Features",
+          "value": 2
+         },
+         {
+          "label": "Fixes",
+          "value": 2
+         },
+         {
+          "label": "Chores",
+          "value": 2
+         }
+        ],
+        "children": []
+       },
+       {
+        "type": "toggle",
+        "label": "Hide chores",
+        "value": true,
+        "_key": "hidechores",
+        "children": []
+       },
+       {
+        "type": "table",
+        "columns": [
+         "Change",
+         "Kind",
+         "Risk",
+         "Tested"
+        ],
+        "rows": [
+         [
+          "Docs section",
+          "feature",
+          "high",
+          "yes"
+         ],
+         [
+          "Fix DEF-8",
+          "fix",
+          "low",
+          "yes"
+         ],
+         [
+          "Approval covers diff",
+          "feature",
+          "high",
+          "yes"
+         ],
+         [
+          "Typo",
+          "fix",
+          "low",
+          "no"
+         ]
+        ],
+        "children": []
+       },
+       {
+        "type": "progress",
+        "label": "Tested",
+        "value": 3,
+        "max": 4,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "ready",
+        "tone": "success",
+        "children": []
+       },
+       {
+        "type": "button",
+        "label": "Ship",
+        "_key": "ship#0",
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "op": "click",
+   "key": "ship#0",
+   "effects": [
+    {
+     "kind": "respond",
+     "fields": {
+      "version": "2.5",
+      "shipped": [
+       "c1",
+       "c2",
+       "c4",
+       "c5"
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

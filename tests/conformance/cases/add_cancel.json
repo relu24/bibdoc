@@ -1,0 +1,336 @@
+{
+ "name": "add_cancel",
+ "source": "let picked = list(\"Orders\", selectable: true) {\n  for o in data.orders where o.status == \"ordered\" { item(o.id, o.title) }\n}\nif button(\"Mark received\", disabled: picked.selected.length == 0).clicked { call(\"shop.orders_receive\", ids: picked.selected) }\nif button(\"Cancel\", disabled: picked.selected.length == 0).clicked { call(\"shop.orders_cancel\", ids: picked.selected) }\n",
+ "data": {
+  "orders": [
+   {
+    "id": "o1",
+    "title": "4K monitor",
+    "status": "ordered"
+   },
+   {
+    "id": "o2",
+    "title": "Light source",
+    "status": "received"
+   },
+   {
+    "id": "o3",
+    "title": "Monitor 27\"",
+    "status": "ordered"
+   },
+   {
+    "id": "o4",
+    "title": "Cables",
+    "status": "ordered"
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "orders": [
+     {
+      "id": "o1",
+      "title": "4K monitor",
+      "status": "ordered"
+     },
+     {
+      "id": "o2",
+      "title": "Light source",
+      "status": "received"
+     },
+     {
+      "id": "o3",
+      "title": "Monitor 27\"",
+      "status": "ordered"
+     },
+     {
+      "id": "o4",
+      "title": "Cables",
+      "status": "ordered"
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "list",
+      "label": "Orders",
+      "selectable": true,
+      "_key": "orders",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "o1",
+        "title": "4K monitor",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "o3",
+        "title": "Monitor 27\"",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "o4",
+        "title": "Cables",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Mark received",
+      "disabled": true,
+      "_key": "markreceived#0",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Cancel",
+      "disabled": true,
+      "_key": "cancel#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "list",
+      "label": "Orders",
+      "selectable": true,
+      "_key": "orders",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "o1",
+        "title": "4K monitor",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "o3",
+        "title": "Monitor 27\"",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "o4",
+        "title": "Cables",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Mark received",
+      "disabled": true,
+      "_key": "markreceived#0",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Cancel",
+      "disabled": true,
+      "_key": "cancel#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "click",
+   "key": "markreceived#0",
+   "effects": []
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "list",
+      "label": "Orders",
+      "selectable": true,
+      "_key": "orders",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "o1",
+        "title": "4K monitor",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "o3",
+        "title": "Monitor 27\"",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "o4",
+        "title": "Cables",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Mark received",
+      "disabled": true,
+      "_key": "markreceived#0",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Cancel",
+      "disabled": true,
+      "_key": "cancel#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "orders",
+   "value": [
+    "o3"
+   ]
+  },
+  {
+   "op": "click",
+   "key": "markreceived#0",
+   "effects": [
+    {
+     "kind": "call",
+     "tool": "shop.orders_receive",
+     "args": {
+      "ids": [
+       "o3"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "op": "session",
+   "data": {
+    "orders": [
+     {
+      "id": "o1",
+      "title": "4K monitor",
+      "status": "ordered"
+     },
+     {
+      "id": "o2",
+      "title": "Light source",
+      "status": "received"
+     },
+     {
+      "id": "o3",
+      "title": "Monitor 27\"",
+      "status": "ordered"
+     },
+     {
+      "id": "o4",
+      "title": "Cables",
+      "status": "ordered"
+     }
+    ]
+   }
+  },
+  {
+   "op": "click",
+   "key": "cancel#0",
+   "effects": []
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "list",
+      "label": "Orders",
+      "selectable": true,
+      "_key": "orders",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "o1",
+        "title": "4K monitor",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "o3",
+        "title": "Monitor 27\"",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "o4",
+        "title": "Cables",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Mark received",
+      "disabled": true,
+      "_key": "markreceived#0",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Cancel",
+      "disabled": true,
+      "_key": "cancel#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "orders",
+   "value": [
+    "o1",
+    "o4"
+   ]
+  },
+  {
+   "op": "click",
+   "key": "cancel#0",
+   "effects": [
+    {
+     "kind": "call",
+     "tool": "shop.orders_cancel",
+     "args": {
+      "ids": [
+       "o1",
+       "o4"
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,42 @@
+{
+ "name": "static_card",
+ "source": "card(\"Release 2.4\") {\n  badge(\"shipped\", tone: \"success\")\n  text(\"Deployed 12 Nov\")\n  stat(\"Tests\", 1284)\n}\n",
+ "data": {},
+ "steps": [
+  {
+   "op": "session",
+   "data": {}
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "card",
+      "title": "Release 2.4",
+      "children": [
+       {
+        "type": "badge",
+        "text": "shipped",
+        "tone": "success",
+        "children": []
+       },
+       {
+        "type": "text",
+        "text": "Deployed 12 Nov",
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Tests",
+        "value": 1284,
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

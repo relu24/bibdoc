@@ -1,0 +1,1226 @@
+{
+ "name": "pricing_savings",
+ "source": "let users = slider(\"Users\", 1, 20, value: 4)\nlet per = slider(\"Cases per user\", 1, 40, value: 10)\nlet planName = choice(\"Plan\", data.plans.map(p => p.name))\nlet annual = toggle(\"Annual\")\nlet plan = data.plans.find(p => p.name == planName)\nlet cases = users * per\nlet monthly = (cases * plan.per_case + plan.base) * (annual ? 0.85 : 1)\nstat(\"Cases per month\", cases)\nstat(\"Monthly cost\", monthly)\nstat(\"Yearly cost\", monthly * 12)\nprogress(\"Capacity\", cases, max: data.capacity)\nif cases > data.capacity { badge(\"over capacity\", tone: \"warning\") }\nstat(\"Savings\", annual ? (cases * plan.per_case + plan.base) * 0.15 * 12 : 0)\n",
+ "data": {
+  "plans": [
+   {
+    "name": "Basic",
+    "per_case": 120,
+    "base": 0
+   },
+   {
+    "name": "Pro",
+    "per_case": 95,
+    "base": 2000
+   }
+  ],
+  "capacity": 300
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "plans": [
+     {
+      "name": "Basic",
+      "per_case": 120,
+      "base": 0
+     },
+     {
+      "name": "Pro",
+      "per_case": 95,
+      "base": 2000
+     }
+    ],
+    "capacity": 300
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 4,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 10,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Basic",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": false,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 40,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 4800,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 57600,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 40,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 0,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 4,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 10,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Basic",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": false,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 40,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 4800,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 57600,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 40,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 0,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 4,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 10,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Basic",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": false,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 40,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 4800,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 57600,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 40,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 0,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 4,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 10,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Basic",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": false,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 40,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 4800,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 57600,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 40,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 0,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 4,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 10,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Basic",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": false,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 40,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 4800,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 57600,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 40,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 0,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "plan",
+   "value": "Pro"
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 4,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 10,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Pro",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": false,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 40,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 5800,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 69600,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 40,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 0,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "annual",
+   "value": true
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 4,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 10,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Pro",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": true,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 40,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 4930,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 59160,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 40,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 10440,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "users",
+   "value": 20
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 20,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 10,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Pro",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": true,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 200,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 17850,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 214200,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 200,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 37800,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "casesperuser",
+   "value": 20
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 20,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 20,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Pro",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": true,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 400,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 34000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 408000,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 400,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "badge",
+      "text": "over capacity",
+      "tone": "warning",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 72000,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 20,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 20,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Pro",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": true,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 400,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 34000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 408000,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 400,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "badge",
+      "text": "over capacity",
+      "tone": "warning",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 72000,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 20,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 20,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Pro",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": true,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 400,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 34000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 408000,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 400,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "badge",
+      "text": "over capacity",
+      "tone": "warning",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 72000,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 20,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 20,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Pro",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": true,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 400,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 34000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 408000,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 400,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "badge",
+      "text": "over capacity",
+      "tone": "warning",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 72000,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 20,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 20,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Pro",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": true,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 400,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 34000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 408000,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 400,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "badge",
+      "text": "over capacity",
+      "tone": "warning",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 72000,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 20,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 20,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Pro",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": true,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 400,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 34000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 408000,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 400,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "badge",
+      "text": "over capacity",
+      "tone": "warning",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 72000,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Users",
+      "min": 1,
+      "max": 20,
+      "value": 20,
+      "_key": "users",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Cases per user",
+      "min": 1,
+      "max": 40,
+      "value": 20,
+      "_key": "casesperuser",
+      "children": []
+     },
+     {
+      "type": "choice",
+      "label": "Plan",
+      "options": [
+       "Basic",
+       "Pro"
+      ],
+      "_key": "plan",
+      "value": "Pro",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Annual",
+      "_key": "annual",
+      "value": true,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Cases per month",
+      "value": 400,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Monthly cost",
+      "value": 34000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Yearly cost",
+      "value": 408000,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Capacity",
+      "value": 400,
+      "max": 300,
+      "children": []
+     },
+     {
+      "type": "badge",
+      "text": "over capacity",
+      "tone": "warning",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Savings",
+      "value": 72000,
+      "children": []
+     }
+    ]
+   }
+  }
+ ]
+}

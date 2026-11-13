@@ -1,0 +1,85 @@
+{
+ "name": "add_column",
+ "source": "table([\"Vendor\", \"Price\", \"Lead (weeks)\", \"Price for 3\"], data.vendors.map(v => [v.name, v.price, v.lead, v.price * 3]))\n",
+ "data": {
+  "vendors": [
+   {
+    "name": "Northwind",
+    "price": 41000,
+    "lead": 6
+   },
+   {
+    "name": "Contoso",
+    "price": 38500,
+    "lead": 10
+   },
+   {
+    "name": "Fabrikam",
+    "price": 45250,
+    "lead": 4
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "vendors": [
+     {
+      "name": "Northwind",
+      "price": 41000,
+      "lead": 6
+     },
+     {
+      "name": "Contoso",
+      "price": 38500,
+      "lead": 10
+     },
+     {
+      "name": "Fabrikam",
+      "price": 45250,
+      "lead": 4
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "table",
+      "columns": [
+       "Vendor",
+       "Price",
+       "Lead (weeks)",
+       "Price for 3"
+      ],
+      "rows": [
+       [
+        "Northwind",
+        41000,
+        6,
+        123000
+       ],
+       [
+        "Contoso",
+        38500,
+        10,
+        115500
+       ],
+       [
+        "Fabrikam",
+        45250,
+        4,
+        135750
+       ]
+      ],
+      "children": []
+     }
+    ]
+   }
+  }
+ ]
+}

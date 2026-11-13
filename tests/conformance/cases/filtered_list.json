@@ -1,0 +1,102 @@
+{
+ "name": "filtered_list",
+ "source": "list(\"Unread\") {\n  for t in data.threads where t.unread { item(t.id, t.subject, subtitle: t.from) }\n}\n",
+ "data": {
+  "threads": [
+   {
+    "id": "t1",
+    "subject": "Contract v3",
+    "from": "Robin",
+    "unread": true
+   },
+   {
+    "id": "t2",
+    "subject": "CI failing on main",
+    "from": "Build bot",
+    "unread": true
+   },
+   {
+    "id": "t3",
+    "subject": "Lunch Friday?",
+    "from": "Jonas",
+    "unread": false
+   },
+   {
+    "id": "t4",
+    "subject": "Invoice 2211",
+    "from": "Ledgerly",
+    "unread": true
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "threads": [
+     {
+      "id": "t1",
+      "subject": "Contract v3",
+      "from": "Robin",
+      "unread": true
+     },
+     {
+      "id": "t2",
+      "subject": "CI failing on main",
+      "from": "Build bot",
+      "unread": true
+     },
+     {
+      "id": "t3",
+      "subject": "Lunch Friday?",
+      "from": "Jonas",
+      "unread": false
+     },
+     {
+      "id": "t4",
+      "subject": "Invoice 2211",
+      "from": "Ledgerly",
+      "unread": true
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "list",
+      "label": "Unread",
+      "_key": "unread",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "t1",
+        "title": "Contract v3",
+        "subtitle": "Robin",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "t2",
+        "title": "CI failing on main",
+        "subtitle": "Build bot",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "t4",
+        "title": "Invoice 2211",
+        "subtitle": "Ledgerly",
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

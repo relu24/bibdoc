@@ -1,0 +1,453 @@
+{
+ "name": "filters",
+ "source": "let who = choice(\"Assignee\", [\"Everyone\"].concat(unique(data.issues.map(i => i.assignee))))\nlet open = toggle(\"Only open\", value: true)\nlet shown = data.issues.filter(i => (who == \"Everyone\" || i.assignee == who) && (!open || i.open))\nlist(\"Issues\") { for i in shown { item(i.title, i.title) } }\nstat(\"Shown\", shown.length)\n",
+ "data": {
+  "issues": [
+   {
+    "title": "Login loops",
+    "assignee": "Alex",
+    "open": true
+   },
+   {
+    "title": "Slow export",
+    "assignee": "Sam",
+    "open": true
+   },
+   {
+    "title": "Typo on /quality",
+    "assignee": "Alex",
+    "open": false
+   },
+   {
+    "title": "Logo blurry",
+    "assignee": "Kim",
+    "open": true
+   },
+   {
+    "title": "Calendar off by one",
+    "assignee": "Sam",
+    "open": false
+   },
+   {
+    "title": "Upload stalls",
+    "assignee": "Sam",
+    "open": true
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "issues": [
+     {
+      "title": "Login loops",
+      "assignee": "Alex",
+      "open": true
+     },
+     {
+      "title": "Slow export",
+      "assignee": "Sam",
+      "open": true
+     },
+     {
+      "title": "Typo on /quality",
+      "assignee": "Alex",
+      "open": false
+     },
+     {
+      "title": "Logo blurry",
+      "assignee": "Kim",
+      "open": true
+     },
+     {
+      "title": "Calendar off by one",
+      "assignee": "Sam",
+      "open": false
+     },
+     {
+      "title": "Upload stalls",
+      "assignee": "Sam",
+      "open": true
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Assignee",
+      "options": [
+       "Everyone",
+       "Alex",
+       "Sam",
+       "Kim"
+      ],
+      "_key": "assignee",
+      "value": "Everyone",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Only open",
+      "value": true,
+      "_key": "onlyopen",
+      "children": []
+     },
+     {
+      "type": "list",
+      "label": "Issues",
+      "_key": "issues",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "Login loops",
+        "title": "Login loops",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Slow export",
+        "title": "Slow export",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Logo blurry",
+        "title": "Logo blurry",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Upload stalls",
+        "title": "Upload stalls",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "stat",
+      "label": "Shown",
+      "value": 4,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Assignee",
+      "options": [
+       "Everyone",
+       "Alex",
+       "Sam",
+       "Kim"
+      ],
+      "_key": "assignee",
+      "value": "Everyone",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Only open",
+      "value": true,
+      "_key": "onlyopen",
+      "children": []
+     },
+     {
+      "type": "list",
+      "label": "Issues",
+      "_key": "issues",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "Login loops",
+        "title": "Login loops",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Slow export",
+        "title": "Slow export",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Logo blurry",
+        "title": "Logo blurry",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Upload stalls",
+        "title": "Upload stalls",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "stat",
+      "label": "Shown",
+      "value": 4,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Assignee",
+      "options": [
+       "Everyone",
+       "Alex",
+       "Sam",
+       "Kim"
+      ],
+      "_key": "assignee",
+      "value": "Everyone",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Only open",
+      "value": true,
+      "_key": "onlyopen",
+      "children": []
+     },
+     {
+      "type": "list",
+      "label": "Issues",
+      "_key": "issues",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "Login loops",
+        "title": "Login loops",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Slow export",
+        "title": "Slow export",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Logo blurry",
+        "title": "Logo blurry",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Upload stalls",
+        "title": "Upload stalls",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "stat",
+      "label": "Shown",
+      "value": 4,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "assignee",
+   "value": "Sam"
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Assignee",
+      "options": [
+       "Everyone",
+       "Alex",
+       "Sam",
+       "Kim"
+      ],
+      "_key": "assignee",
+      "value": "Sam",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Only open",
+      "value": true,
+      "_key": "onlyopen",
+      "children": []
+     },
+     {
+      "type": "list",
+      "label": "Issues",
+      "_key": "issues",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "Slow export",
+        "title": "Slow export",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Upload stalls",
+        "title": "Upload stalls",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "stat",
+      "label": "Shown",
+      "value": 2,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Assignee",
+      "options": [
+       "Everyone",
+       "Alex",
+       "Sam",
+       "Kim"
+      ],
+      "_key": "assignee",
+      "value": "Sam",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Only open",
+      "value": true,
+      "_key": "onlyopen",
+      "children": []
+     },
+     {
+      "type": "list",
+      "label": "Issues",
+      "_key": "issues",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "Slow export",
+        "title": "Slow export",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Upload stalls",
+        "title": "Upload stalls",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "stat",
+      "label": "Shown",
+      "value": 2,
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "onlyopen",
+   "value": false
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Assignee",
+      "options": [
+       "Everyone",
+       "Alex",
+       "Sam",
+       "Kim"
+      ],
+      "_key": "assignee",
+      "value": "Sam",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Only open",
+      "value": false,
+      "_key": "onlyopen",
+      "children": []
+     },
+     {
+      "type": "list",
+      "label": "Issues",
+      "_key": "issues",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "Slow export",
+        "title": "Slow export",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Calendar off by one",
+        "title": "Calendar off by one",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Upload stalls",
+        "title": "Upload stalls",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "stat",
+      "label": "Shown",
+      "value": 3,
+      "children": []
+     }
+    ]
+   }
+  }
+ ]
+}

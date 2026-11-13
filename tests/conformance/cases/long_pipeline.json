@@ -1,0 +1,1044 @@
+{
+ "name": "long_pipeline",
+ "source": "let all = data.investors\nheading(\"Investor pipeline\")\nrow {\n  stat(\"Investors\", all.length)\n  stat(\"In DD\", all.count(i => i.stage == \"dd\"))\n  stat(\"Pipeline\", all.filter(i => [\"meeting\", \"dd\", \"term\"].includes(i.stage)).sum(i => i.ticket))\n}\nlet owner = choice(\"Owner\", [\"Anyone\", ...unique(all.map(i => i.owner))])\nlet minFit = slider(\"Min fit\", 0, 100, value: 50)\nlet matching = all.filter(i => (owner == \"Anyone\" || i.owner == owner) && i.fit >= minFit)\nfor stage in data.stages {\n  let label = data.stage_labels[stage]\n  let here = matching.filter(i => i.stage == stage)\n  section(label) {\n    if here.length > 0 {\n      list(label) {\n        for i in here {\n          item(i.id, i.name, subtitle: \"{i.ticket} EUR · fit {i.fit}\", badge: i.fit >= 80 ? \"hot\" : null, tone: i.fit >= 80 ? success : null)\n        }\n      }\n    } else { text(\"Nobody here\", tone: muted) }\n  }\n}\nlet cands = list(\"Advance candidates\", selectable: true) {\n  for i in matching where i.stage == \"meeting\" || i.stage == \"dd\" { item(i.id, i.name) }\n}\nif button(\"Advance\", disabled: cands.selected.length == 0).clicked { call(\"shop.investors_advance\", ids: cands.selected) }\n",
+ "data": {
+  "stages": [
+   "lead",
+   "meeting",
+   "dd",
+   "term"
+  ],
+  "stage_labels": {
+   "lead": "Leads",
+   "meeting": "Meetings",
+   "dd": "Due diligence",
+   "term": "Term sheet"
+  },
+  "investors": [
+   {
+    "id": "i1",
+    "name": "North Star Ventures",
+    "stage": "meeting",
+    "ticket": 5000000,
+    "fit": 85,
+    "owner": "Alex"
+   },
+   {
+    "id": "i2",
+    "name": "Bluebird Fund",
+    "stage": "lead",
+    "ticket": 10000000,
+    "fit": 40,
+    "owner": "Alex"
+   },
+   {
+    "id": "i3",
+    "name": "Seed Capital",
+    "stage": "dd",
+    "ticket": 3000000,
+    "fit": 72,
+    "owner": "Sam"
+   },
+   {
+    "id": "i4",
+    "name": "Harbor Partners",
+    "stage": "lead",
+    "ticket": 2000000,
+    "fit": 65,
+    "owner": "Sam"
+   },
+   {
+    "id": "i5",
+    "name": "Acorn Seeds",
+    "stage": "meeting",
+    "ticket": 8000000,
+    "fit": 91,
+    "owner": "Sam"
+   },
+   {
+    "id": "i6",
+    "name": "Growth Fund",
+    "stage": "term",
+    "ticket": 6000000,
+    "fit": 58,
+    "owner": "Alex"
+   },
+   {
+    "id": "i7",
+    "name": "Angel group",
+    "stage": "lead",
+    "ticket": 500000,
+    "fit": 30,
+    "owner": "Kim"
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "stages": [
+     "lead",
+     "meeting",
+     "dd",
+     "term"
+    ],
+    "stage_labels": {
+     "lead": "Leads",
+     "meeting": "Meetings",
+     "dd": "Due diligence",
+     "term": "Term sheet"
+    },
+    "investors": [
+     {
+      "id": "i1",
+      "name": "North Star Ventures",
+      "stage": "meeting",
+      "ticket": 5000000,
+      "fit": 85,
+      "owner": "Alex"
+     },
+     {
+      "id": "i2",
+      "name": "Bluebird Fund",
+      "stage": "lead",
+      "ticket": 10000000,
+      "fit": 40,
+      "owner": "Alex"
+     },
+     {
+      "id": "i3",
+      "name": "Seed Capital",
+      "stage": "dd",
+      "ticket": 3000000,
+      "fit": 72,
+      "owner": "Sam"
+     },
+     {
+      "id": "i4",
+      "name": "Harbor Partners",
+      "stage": "lead",
+      "ticket": 2000000,
+      "fit": 65,
+      "owner": "Sam"
+     },
+     {
+      "id": "i5",
+      "name": "Acorn Seeds",
+      "stage": "meeting",
+      "ticket": 8000000,
+      "fit": 91,
+      "owner": "Sam"
+     },
+     {
+      "id": "i6",
+      "name": "Growth Fund",
+      "stage": "term",
+      "ticket": 6000000,
+      "fit": 58,
+      "owner": "Alex"
+     },
+     {
+      "id": "i7",
+      "name": "Angel group",
+      "stage": "lead",
+      "ticket": 500000,
+      "fit": 30,
+      "owner": "Kim"
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "heading",
+      "text": "Investor pipeline",
+      "children": []
+     },
+     {
+      "type": "row",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Investors",
+        "value": 7,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "In DD",
+        "value": 1,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Pipeline",
+        "value": 22000000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Owner",
+      "options": [
+       "Anyone",
+       "Alex",
+       "Sam",
+       "Kim"
+      ],
+      "_key": "owner",
+      "value": "Anyone",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Min fit",
+      "min": 0,
+      "max": 100,
+      "value": 50,
+      "_key": "minfit",
+      "children": []
+     },
+     {
+      "type": "section",
+      "title": "Leads",
+      "children": [
+       {
+        "type": "list",
+        "label": "Leads",
+        "_key": "leads",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i4",
+          "title": "Harbor Partners",
+          "subtitle": "2000000 EUR · fit 65",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Meetings",
+      "children": [
+       {
+        "type": "list",
+        "label": "Meetings",
+        "_key": "meetings",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i1",
+          "title": "North Star Ventures",
+          "subtitle": "5000000 EUR · fit 85",
+          "badge": "hot",
+          "tone": "success",
+          "children": []
+         },
+         {
+          "type": "item",
+          "id": "i5",
+          "title": "Acorn Seeds",
+          "subtitle": "8000000 EUR · fit 91",
+          "badge": "hot",
+          "tone": "success",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Due diligence",
+      "children": [
+       {
+        "type": "list",
+        "label": "Due diligence",
+        "_key": "duediligence",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i3",
+          "title": "Seed Capital",
+          "subtitle": "3000000 EUR · fit 72",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Term sheet",
+      "children": [
+       {
+        "type": "list",
+        "label": "Term sheet",
+        "_key": "termsheet",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i6",
+          "title": "Growth Fund",
+          "subtitle": "6000000 EUR · fit 58",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "list",
+      "label": "Advance candidates",
+      "selectable": true,
+      "_key": "advancecandidates",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "i1",
+        "title": "North Star Ventures",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "i3",
+        "title": "Seed Capital",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "i5",
+        "title": "Acorn Seeds",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Advance",
+      "disabled": true,
+      "_key": "advance#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "click",
+   "key": "advance#0",
+   "effects": []
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "heading",
+      "text": "Investor pipeline",
+      "children": []
+     },
+     {
+      "type": "row",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Investors",
+        "value": 7,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "In DD",
+        "value": 1,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Pipeline",
+        "value": 22000000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Owner",
+      "options": [
+       "Anyone",
+       "Alex",
+       "Sam",
+       "Kim"
+      ],
+      "_key": "owner",
+      "value": "Anyone",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Min fit",
+      "min": 0,
+      "max": 100,
+      "value": 50,
+      "_key": "minfit",
+      "children": []
+     },
+     {
+      "type": "section",
+      "title": "Leads",
+      "children": [
+       {
+        "type": "list",
+        "label": "Leads",
+        "_key": "leads",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i4",
+          "title": "Harbor Partners",
+          "subtitle": "2000000 EUR · fit 65",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Meetings",
+      "children": [
+       {
+        "type": "list",
+        "label": "Meetings",
+        "_key": "meetings",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i1",
+          "title": "North Star Ventures",
+          "subtitle": "5000000 EUR · fit 85",
+          "badge": "hot",
+          "tone": "success",
+          "children": []
+         },
+         {
+          "type": "item",
+          "id": "i5",
+          "title": "Acorn Seeds",
+          "subtitle": "8000000 EUR · fit 91",
+          "badge": "hot",
+          "tone": "success",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Due diligence",
+      "children": [
+       {
+        "type": "list",
+        "label": "Due diligence",
+        "_key": "duediligence",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i3",
+          "title": "Seed Capital",
+          "subtitle": "3000000 EUR · fit 72",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Term sheet",
+      "children": [
+       {
+        "type": "list",
+        "label": "Term sheet",
+        "_key": "termsheet",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i6",
+          "title": "Growth Fund",
+          "subtitle": "6000000 EUR · fit 58",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "list",
+      "label": "Advance candidates",
+      "selectable": true,
+      "_key": "advancecandidates",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "i1",
+        "title": "North Star Ventures",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "i3",
+        "title": "Seed Capital",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "i5",
+        "title": "Acorn Seeds",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Advance",
+      "disabled": true,
+      "_key": "advance#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "advancecandidates",
+   "value": [
+    "i5"
+   ]
+  },
+  {
+   "op": "click",
+   "key": "advance#0",
+   "effects": [
+    {
+     "kind": "call",
+     "tool": "shop.investors_advance",
+     "args": {
+      "ids": [
+       "i5"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "heading",
+      "text": "Investor pipeline",
+      "children": []
+     },
+     {
+      "type": "row",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Investors",
+        "value": 7,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "In DD",
+        "value": 1,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Pipeline",
+        "value": 22000000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Owner",
+      "options": [
+       "Anyone",
+       "Alex",
+       "Sam",
+       "Kim"
+      ],
+      "_key": "owner",
+      "value": "Anyone",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Min fit",
+      "min": 0,
+      "max": 100,
+      "value": 50,
+      "_key": "minfit",
+      "children": []
+     },
+     {
+      "type": "section",
+      "title": "Leads",
+      "children": [
+       {
+        "type": "list",
+        "label": "Leads",
+        "_key": "leads",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i4",
+          "title": "Harbor Partners",
+          "subtitle": "2000000 EUR · fit 65",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Meetings",
+      "children": [
+       {
+        "type": "list",
+        "label": "Meetings",
+        "_key": "meetings",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i1",
+          "title": "North Star Ventures",
+          "subtitle": "5000000 EUR · fit 85",
+          "badge": "hot",
+          "tone": "success",
+          "children": []
+         },
+         {
+          "type": "item",
+          "id": "i5",
+          "title": "Acorn Seeds",
+          "subtitle": "8000000 EUR · fit 91",
+          "badge": "hot",
+          "tone": "success",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Due diligence",
+      "children": [
+       {
+        "type": "list",
+        "label": "Due diligence",
+        "_key": "duediligence",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i3",
+          "title": "Seed Capital",
+          "subtitle": "3000000 EUR · fit 72",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Term sheet",
+      "children": [
+       {
+        "type": "list",
+        "label": "Term sheet",
+        "_key": "termsheet",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i6",
+          "title": "Growth Fund",
+          "subtitle": "6000000 EUR · fit 58",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "list",
+      "label": "Advance candidates",
+      "selectable": true,
+      "_key": "advancecandidates",
+      "selected": [
+       "i5"
+      ],
+      "children": [
+       {
+        "type": "item",
+        "id": "i1",
+        "title": "North Star Ventures",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "i3",
+        "title": "Seed Capital",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "i5",
+        "title": "Acorn Seeds",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Advance",
+      "disabled": false,
+      "_key": "advance#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "owner",
+   "value": "Alex"
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "heading",
+      "text": "Investor pipeline",
+      "children": []
+     },
+     {
+      "type": "row",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Investors",
+        "value": 7,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "In DD",
+        "value": 1,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Pipeline",
+        "value": 22000000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Owner",
+      "options": [
+       "Anyone",
+       "Alex",
+       "Sam",
+       "Kim"
+      ],
+      "_key": "owner",
+      "value": "Alex",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Min fit",
+      "min": 0,
+      "max": 100,
+      "value": 50,
+      "_key": "minfit",
+      "children": []
+     },
+     {
+      "type": "section",
+      "title": "Leads",
+      "children": [
+       {
+        "type": "text",
+        "text": "Nobody here",
+        "tone": "muted",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Meetings",
+      "children": [
+       {
+        "type": "list",
+        "label": "Meetings",
+        "_key": "meetings",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i1",
+          "title": "North Star Ventures",
+          "subtitle": "5000000 EUR · fit 85",
+          "badge": "hot",
+          "tone": "success",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Due diligence",
+      "children": [
+       {
+        "type": "text",
+        "text": "Nobody here",
+        "tone": "muted",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Term sheet",
+      "children": [
+       {
+        "type": "list",
+        "label": "Term sheet",
+        "_key": "termsheet",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i6",
+          "title": "Growth Fund",
+          "subtitle": "6000000 EUR · fit 58",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "list",
+      "label": "Advance candidates",
+      "selectable": true,
+      "_key": "advancecandidates",
+      "selected": [
+       "i5"
+      ],
+      "children": [
+       {
+        "type": "item",
+        "id": "i1",
+        "title": "North Star Ventures",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Advance",
+      "disabled": false,
+      "_key": "advance#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "minfit",
+   "value": 60
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "heading",
+      "text": "Investor pipeline",
+      "children": []
+     },
+     {
+      "type": "row",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Investors",
+        "value": 7,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "In DD",
+        "value": 1,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Pipeline",
+        "value": 22000000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Owner",
+      "options": [
+       "Anyone",
+       "Alex",
+       "Sam",
+       "Kim"
+      ],
+      "_key": "owner",
+      "value": "Alex",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Min fit",
+      "min": 0,
+      "max": 100,
+      "value": 60,
+      "_key": "minfit",
+      "children": []
+     },
+     {
+      "type": "section",
+      "title": "Leads",
+      "children": [
+       {
+        "type": "text",
+        "text": "Nobody here",
+        "tone": "muted",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Meetings",
+      "children": [
+       {
+        "type": "list",
+        "label": "Meetings",
+        "_key": "meetings",
+        "selected": [],
+        "children": [
+         {
+          "type": "item",
+          "id": "i1",
+          "title": "North Star Ventures",
+          "subtitle": "5000000 EUR · fit 85",
+          "badge": "hot",
+          "tone": "success",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Due diligence",
+      "children": [
+       {
+        "type": "text",
+        "text": "Nobody here",
+        "tone": "muted",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "section",
+      "title": "Term sheet",
+      "children": [
+       {
+        "type": "text",
+        "text": "Nobody here",
+        "tone": "muted",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "list",
+      "label": "Advance candidates",
+      "selectable": true,
+      "_key": "advancecandidates",
+      "selected": [
+       "i5"
+      ],
+      "children": [
+       {
+        "type": "item",
+        "id": "i1",
+        "title": "North Star Ventures",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Advance",
+      "disabled": false,
+      "_key": "advance#0",
+      "children": []
+     }
+    ]
+   }
+  }
+ ]
+}

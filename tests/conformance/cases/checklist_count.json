@@ -1,0 +1,122 @@
+{
+ "name": "checklist_count",
+ "source": "let done = checklist(\"Steps\", data.steps)\nstat(\"Done\", \"{done.length} of {data.steps.length}\")\n",
+ "data": {
+  "steps": [
+   "Draft",
+   "Review",
+   "Sign",
+   "File",
+   "Announce"
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "steps": [
+     "Draft",
+     "Review",
+     "Sign",
+     "File",
+     "Announce"
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "checklist",
+      "label": "Steps",
+      "options": [
+       "Draft",
+       "Review",
+       "Sign",
+       "File",
+       "Announce"
+      ],
+      "_key": "steps",
+      "value": [],
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Done",
+      "value": "0 of 5",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "checklist",
+      "label": "Steps",
+      "options": [
+       "Draft",
+       "Review",
+       "Sign",
+       "File",
+       "Announce"
+      ],
+      "_key": "steps",
+      "value": [],
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Done",
+      "value": "0 of 5",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "steps",
+   "value": [
+    "Draft",
+    "Sign"
+   ]
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "checklist",
+      "label": "Steps",
+      "options": [
+       "Draft",
+       "Review",
+       "Sign",
+       "File",
+       "Announce"
+      ],
+      "_key": "steps",
+      "value": [
+       "Draft",
+       "Sign"
+      ],
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Done",
+      "value": "2 of 5",
+      "children": []
+     }
+    ]
+   }
+  }
+ ]
+}

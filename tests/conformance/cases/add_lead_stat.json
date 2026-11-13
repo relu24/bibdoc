@@ -1,0 +1,378 @@
+{
+ "name": "add_lead_stat",
+ "source": "let vendor = choice(\"Vendor\", data.vendors.map(v => v.name))\nlet units = slider(\"Units\", 1, 10, value: 2)\nlet v = data.vendors.find(x => x.name == vendor)\nstat(\"Total\", v.price * units)\nstat(\"Lead time\", v.lead, unit: \"weeks\")\n",
+ "data": {
+  "vendors": [
+   {
+    "name": "Northwind",
+    "price": 41000,
+    "lead": 6
+   },
+   {
+    "name": "Contoso",
+    "price": 38500,
+    "lead": 10
+   },
+   {
+    "name": "Fabrikam",
+    "price": 45250,
+    "lead": 4
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "vendors": [
+     {
+      "name": "Northwind",
+      "price": 41000,
+      "lead": 6
+     },
+     {
+      "name": "Contoso",
+      "price": 38500,
+      "lead": 10
+     },
+     {
+      "name": "Fabrikam",
+      "price": 45250,
+      "lead": 4
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Vendor",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "vendor",
+      "value": "Northwind",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Units",
+      "min": 1,
+      "max": 10,
+      "value": 2,
+      "_key": "units",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Total",
+      "value": 82000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Lead time",
+      "value": 6,
+      "unit": "weeks",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Vendor",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "vendor",
+      "value": "Northwind",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Units",
+      "min": 1,
+      "max": 10,
+      "value": 2,
+      "_key": "units",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Total",
+      "value": 82000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Lead time",
+      "value": 6,
+      "unit": "weeks",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "vendor",
+   "value": "Contoso"
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Vendor",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "vendor",
+      "value": "Contoso",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Units",
+      "min": 1,
+      "max": 10,
+      "value": 2,
+      "_key": "units",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Total",
+      "value": 77000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Lead time",
+      "value": 10,
+      "unit": "weeks",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "units",
+   "value": 4
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Vendor",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "vendor",
+      "value": "Contoso",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Units",
+      "min": 1,
+      "max": 10,
+      "value": 4,
+      "_key": "units",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Total",
+      "value": 154000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Lead time",
+      "value": 10,
+      "unit": "weeks",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "session",
+   "data": {
+    "vendors": [
+     {
+      "name": "Northwind",
+      "price": 41000,
+      "lead": 6
+     },
+     {
+      "name": "Contoso",
+      "price": 38500,
+      "lead": 10
+     },
+     {
+      "name": "Fabrikam",
+      "price": 45250,
+      "lead": 4
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Vendor",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "vendor",
+      "value": "Northwind",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Units",
+      "min": 1,
+      "max": 10,
+      "value": 2,
+      "_key": "units",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Total",
+      "value": 82000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Lead time",
+      "value": 6,
+      "unit": "weeks",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Vendor",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "vendor",
+      "value": "Northwind",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Units",
+      "min": 1,
+      "max": 10,
+      "value": 2,
+      "_key": "units",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Total",
+      "value": 82000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Lead time",
+      "value": 6,
+      "unit": "weeks",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "vendor",
+   "value": "Contoso"
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Vendor",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "vendor",
+      "value": "Contoso",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Units",
+      "min": 1,
+      "max": 10,
+      "value": 2,
+      "_key": "units",
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Total",
+      "value": 77000,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Lead time",
+      "value": 10,
+      "unit": "weeks",
+      "children": []
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,1262 @@
+{
+ "name": "long_compare",
+ "source": "let wq = slider(\"Quality weight\", 0, 10, value: 5)\nlet ws = slider(\"Service weight\", 0, 10, value: 3)\nlet wf = slider(\"Fit weight\", 0, 10, value: 2)\nlet score = v => {\n  let total = wq + ws + wf\n  return total == 0 ? 0 : round((v.quality * wq + v.service * ws + v.fit * wf) / total, 1)\n}\nlet top = max(data.vendors.map(score))\nfor v in data.vendors {\n  card(v.name) {\n    stat(\"Score\", score(v))\n    stat(\"Price\", v.price)\n    if score(v) == top { badge(\"best\", tone: accent) }\n  }\n}\nlet pick = choice(\"Pick\", data.vendors.map(v => v.name))\nif button(\"Choose\").clicked { respond(vendor: pick, score: score(data.vendors.find(v => v.name == pick))) }\n",
+ "data": {
+  "vendors": [
+   {
+    "name": "Northwind",
+    "price": 41000,
+    "quality": 8,
+    "service": 6,
+    "fit": 7
+   },
+   {
+    "name": "Contoso",
+    "price": 38500,
+    "quality": 9,
+    "service": 5,
+    "fit": 5
+   },
+   {
+    "name": "Fabrikam",
+    "price": 45250,
+    "quality": 6,
+    "service": 9,
+    "fit": 8
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "vendors": [
+     {
+      "name": "Northwind",
+      "price": 41000,
+      "quality": 8,
+      "service": 6,
+      "fit": 7
+     },
+     {
+      "name": "Contoso",
+      "price": 38500,
+      "quality": 9,
+      "service": 5,
+      "fit": 5
+     },
+     {
+      "name": "Fabrikam",
+      "price": 45250,
+      "quality": 6,
+      "service": 9,
+      "fit": 8
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Quality weight",
+      "min": 0,
+      "max": 10,
+      "value": 5,
+      "_key": "qualityweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Service weight",
+      "min": 0,
+      "max": 10,
+      "value": 3,
+      "_key": "serviceweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Fit weight",
+      "min": 0,
+      "max": 10,
+      "value": 2,
+      "_key": "fitweight",
+      "children": []
+     },
+     {
+      "type": "card",
+      "title": "Northwind",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7.2,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 41000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Contoso",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 38500,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Fabrikam",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7.3,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 45250,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Pick",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "pick",
+      "value": "Northwind",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Choose",
+      "_key": "choose#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "click",
+   "key": "choose#0",
+   "effects": [
+    {
+     "kind": "respond",
+     "fields": {
+      "vendor": "Northwind",
+      "score": 7.2
+     }
+    }
+   ]
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Quality weight",
+      "min": 0,
+      "max": 10,
+      "value": 5,
+      "_key": "qualityweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Service weight",
+      "min": 0,
+      "max": 10,
+      "value": 3,
+      "_key": "serviceweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Fit weight",
+      "min": 0,
+      "max": 10,
+      "value": 2,
+      "_key": "fitweight",
+      "children": []
+     },
+     {
+      "type": "card",
+      "title": "Northwind",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7.2,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 41000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Contoso",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 38500,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Fabrikam",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7.3,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 45250,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Pick",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "pick",
+      "value": "Northwind",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Choose",
+      "_key": "choose#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "qualityweight",
+   "value": 10
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Quality weight",
+      "min": 0,
+      "max": 10,
+      "value": 10,
+      "_key": "qualityweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Service weight",
+      "min": 0,
+      "max": 10,
+      "value": 3,
+      "_key": "serviceweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Fit weight",
+      "min": 0,
+      "max": 10,
+      "value": 2,
+      "_key": "fitweight",
+      "children": []
+     },
+     {
+      "type": "card",
+      "title": "Northwind",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7.5,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 41000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Contoso",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7.7,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 38500,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Fabrikam",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 6.9,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 45250,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Pick",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "pick",
+      "value": "Northwind",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Choose",
+      "_key": "choose#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "serviceweight",
+   "value": 1
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Quality weight",
+      "min": 0,
+      "max": 10,
+      "value": 10,
+      "_key": "qualityweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Service weight",
+      "min": 0,
+      "max": 10,
+      "value": 1,
+      "_key": "serviceweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Fit weight",
+      "min": 0,
+      "max": 10,
+      "value": 2,
+      "_key": "fitweight",
+      "children": []
+     },
+     {
+      "type": "card",
+      "title": "Northwind",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7.7,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 41000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Contoso",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 8.1,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 38500,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Fabrikam",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 6.5,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 45250,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Pick",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "pick",
+      "value": "Northwind",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Choose",
+      "_key": "choose#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "fitweight",
+   "value": 1
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Quality weight",
+      "min": 0,
+      "max": 10,
+      "value": 10,
+      "_key": "qualityweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Service weight",
+      "min": 0,
+      "max": 10,
+      "value": 1,
+      "_key": "serviceweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Fit weight",
+      "min": 0,
+      "max": 10,
+      "value": 1,
+      "_key": "fitweight",
+      "children": []
+     },
+     {
+      "type": "card",
+      "title": "Northwind",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7.8,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 41000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Contoso",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 8.3,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 38500,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Fabrikam",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 6.4,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 45250,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Pick",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "pick",
+      "value": "Northwind",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Choose",
+      "_key": "choose#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Quality weight",
+      "min": 0,
+      "max": 10,
+      "value": 10,
+      "_key": "qualityweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Service weight",
+      "min": 0,
+      "max": 10,
+      "value": 1,
+      "_key": "serviceweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Fit weight",
+      "min": 0,
+      "max": 10,
+      "value": 1,
+      "_key": "fitweight",
+      "children": []
+     },
+     {
+      "type": "card",
+      "title": "Northwind",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7.8,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 41000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Contoso",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 8.3,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 38500,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Fabrikam",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 6.4,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 45250,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Pick",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "pick",
+      "value": "Northwind",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Choose",
+      "_key": "choose#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "pick",
+   "value": "Contoso"
+  },
+  {
+   "op": "click",
+   "key": "choose#0",
+   "effects": [
+    {
+     "kind": "respond",
+     "fields": {
+      "vendor": "Contoso",
+      "score": 8.3
+     }
+    }
+   ]
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Quality weight",
+      "min": 0,
+      "max": 10,
+      "value": 10,
+      "_key": "qualityweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Service weight",
+      "min": 0,
+      "max": 10,
+      "value": 1,
+      "_key": "serviceweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Fit weight",
+      "min": 0,
+      "max": 10,
+      "value": 1,
+      "_key": "fitweight",
+      "children": []
+     },
+     {
+      "type": "card",
+      "title": "Northwind",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7.8,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 41000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Contoso",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 8.3,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 38500,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Fabrikam",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 6.4,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 45250,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Pick",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "pick",
+      "value": "Contoso",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Choose",
+      "_key": "choose#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "qualityweight",
+   "value": 0
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Quality weight",
+      "min": 0,
+      "max": 10,
+      "value": 0,
+      "_key": "qualityweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Service weight",
+      "min": 0,
+      "max": 10,
+      "value": 1,
+      "_key": "serviceweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Fit weight",
+      "min": 0,
+      "max": 10,
+      "value": 1,
+      "_key": "fitweight",
+      "children": []
+     },
+     {
+      "type": "card",
+      "title": "Northwind",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 6.5,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 41000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Contoso",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 5,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 38500,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Fabrikam",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 8.5,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 45250,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Pick",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "pick",
+      "value": "Contoso",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Choose",
+      "_key": "choose#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "serviceweight",
+   "value": 0
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Quality weight",
+      "min": 0,
+      "max": 10,
+      "value": 0,
+      "_key": "qualityweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Service weight",
+      "min": 0,
+      "max": 10,
+      "value": 0,
+      "_key": "serviceweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Fit weight",
+      "min": 0,
+      "max": 10,
+      "value": 1,
+      "_key": "fitweight",
+      "children": []
+     },
+     {
+      "type": "card",
+      "title": "Northwind",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 7,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 41000,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Contoso",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 5,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 38500,
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Fabrikam",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 8,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 45250,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Pick",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "pick",
+      "value": "Contoso",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Choose",
+      "_key": "choose#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "fitweight",
+   "value": 0
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "slider",
+      "label": "Quality weight",
+      "min": 0,
+      "max": 10,
+      "value": 0,
+      "_key": "qualityweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Service weight",
+      "min": 0,
+      "max": 10,
+      "value": 0,
+      "_key": "serviceweight",
+      "children": []
+     },
+     {
+      "type": "slider",
+      "label": "Fit weight",
+      "min": 0,
+      "max": 10,
+      "value": 0,
+      "_key": "fitweight",
+      "children": []
+     },
+     {
+      "type": "card",
+      "title": "Northwind",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 0,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 41000,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Contoso",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 0,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 38500,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Fabrikam",
+      "children": [
+       {
+        "type": "stat",
+        "label": "Score",
+        "value": 0,
+        "children": []
+       },
+       {
+        "type": "stat",
+        "label": "Price",
+        "value": 45250,
+        "children": []
+       },
+       {
+        "type": "badge",
+        "text": "best",
+        "tone": "accent",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "label": "Pick",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "pick",
+      "value": "Contoso",
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Choose",
+      "_key": "choose#0",
+      "children": []
+     }
+    ]
+   }
+  }
+ ]
+}

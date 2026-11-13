@@ -1,0 +1,149 @@
+{
+ "name": "respond_vote",
+ "source": "let v = choice(\"Vendor\", data.vendors.map(x => x.name))\nlet urgent = toggle(\"Urgent\")\nif button(\"Vote\").clicked { respond(vote: v, urgent: urgent) }\n",
+ "data": {
+  "vendors": [
+   {
+    "name": "Northwind",
+    "price": 41000,
+    "lead": 6
+   },
+   {
+    "name": "Contoso",
+    "price": 38500,
+    "lead": 10
+   },
+   {
+    "name": "Fabrikam",
+    "price": 45250,
+    "lead": 4
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "vendors": [
+     {
+      "name": "Northwind",
+      "price": 41000,
+      "lead": 6
+     },
+     {
+      "name": "Contoso",
+      "price": 38500,
+      "lead": 10
+     },
+     {
+      "name": "Fabrikam",
+      "price": 45250,
+      "lead": 4
+     }
+    ]
+   }
+  },
+  {
+   "op": "click",
+   "key": "vote#0",
+   "effects": [
+    {
+     "kind": "respond",
+     "fields": {
+      "vote": "Northwind",
+      "urgent": false
+     }
+    }
+   ]
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Vendor",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "vendor",
+      "value": "Northwind",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Urgent",
+      "_key": "urgent",
+      "value": false,
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Vote",
+      "_key": "vote#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "vendor",
+   "value": "Fabrikam"
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Vendor",
+      "options": [
+       "Northwind",
+       "Contoso",
+       "Fabrikam"
+      ],
+      "_key": "vendor",
+      "value": "Fabrikam",
+      "children": []
+     },
+     {
+      "type": "toggle",
+      "label": "Urgent",
+      "_key": "urgent",
+      "value": false,
+      "children": []
+     },
+     {
+      "type": "button",
+      "label": "Vote",
+      "_key": "vote#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "urgent",
+   "value": true
+  },
+  {
+   "op": "click",
+   "key": "vote#0",
+   "effects": [
+    {
+     "kind": "respond",
+     "fields": {
+      "vote": "Fabrikam",
+      "urgent": true
+     }
+    }
+   ]
+  }
+ ]
+}

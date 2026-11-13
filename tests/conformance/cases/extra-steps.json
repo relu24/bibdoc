@@ -1,0 +1,247 @@
+{
+ "name": "extra-steps",
+ "source": "let show = choice(\"Show\", [\"Every step\", \"Only open\"])\nsteps {\n  for s in data.steps where show == \"Every step\" || s.kind != \"done\" {\n    step(s.n, s.title, status: s.status, tone: s.kind == \"done\" ? success : warning, who: s.who, phase: s.phase) {\n      if s.refs { chips(s.refs, tone: muted) }\n      if s.note { text(s.note) }\n    }\n  }\n}\ntable([\"Rule\", \"Governs\"], data.steps.map(s => [s.title, s.note ?? \"\"]), widths: [1, 2])\n",
+ "data": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Spec",
+    "status": "v1.3 · 5 Oct",
+    "kind": "done",
+    "who": "Morgan",
+    "phase": "Prepare",
+    "note": "One frozen version."
+   },
+   {
+    "n": 2,
+    "title": "Needs review?",
+    "status": "No · 24 Sep",
+    "kind": "done",
+    "who": "Legal",
+    "phase": "Prepare",
+    "refs": [
+     "Policy 2.1"
+    ]
+   },
+   {
+    "n": 3,
+    "title": "Security signed",
+    "status": "TK-94",
+    "kind": "open",
+    "who": "Security",
+    "phase": "Approve",
+    "note": "Confirm it is signed."
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "steps": [
+     {
+      "n": 1,
+      "title": "Spec",
+      "status": "v1.3 · 5 Oct",
+      "kind": "done",
+      "who": "Morgan",
+      "phase": "Prepare",
+      "note": "One frozen version."
+     },
+     {
+      "n": 2,
+      "title": "Needs review?",
+      "status": "No · 24 Sep",
+      "kind": "done",
+      "who": "Legal",
+      "phase": "Prepare",
+      "refs": [
+       "Policy 2.1"
+      ]
+     },
+     {
+      "n": 3,
+      "title": "Security signed",
+      "status": "TK-94",
+      "kind": "open",
+      "who": "Security",
+      "phase": "Approve",
+      "note": "Confirm it is signed."
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Show",
+      "options": [
+       "Every step",
+       "Only open"
+      ],
+      "_key": "show",
+      "value": "Every step",
+      "children": []
+     },
+     {
+      "type": "steps",
+      "children": [
+       {
+        "type": "step",
+        "n": 1,
+        "title": "Spec",
+        "status": "v1.3 · 5 Oct",
+        "tone": "success",
+        "who": "Morgan",
+        "phase": "Prepare",
+        "children": [
+         {
+          "type": "text",
+          "text": "One frozen version.",
+          "children": []
+         }
+        ]
+       },
+       {
+        "type": "step",
+        "n": 2,
+        "title": "Needs review?",
+        "status": "No · 24 Sep",
+        "tone": "success",
+        "who": "Legal",
+        "phase": "Prepare",
+        "children": [
+         {
+          "type": "chips",
+          "items": [
+           "Policy 2.1"
+          ],
+          "tone": "muted",
+          "children": []
+         }
+        ]
+       },
+       {
+        "type": "step",
+        "n": 3,
+        "title": "Security signed",
+        "status": "TK-94",
+        "tone": "warning",
+        "who": "Security",
+        "phase": "Approve",
+        "children": [
+         {
+          "type": "text",
+          "text": "Confirm it is signed.",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "table",
+      "columns": [
+       "Rule",
+       "Governs"
+      ],
+      "rows": [
+       [
+        "Spec",
+        "One frozen version."
+       ],
+       [
+        "Needs review?",
+        ""
+       ],
+       [
+        "Security signed",
+        "Confirm it is signed."
+       ]
+      ],
+      "widths": [
+       1,
+       2
+      ],
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "show",
+   "value": "Only open"
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "choice",
+      "label": "Show",
+      "options": [
+       "Every step",
+       "Only open"
+      ],
+      "_key": "show",
+      "value": "Only open",
+      "children": []
+     },
+     {
+      "type": "steps",
+      "children": [
+       {
+        "type": "step",
+        "n": 3,
+        "title": "Security signed",
+        "status": "TK-94",
+        "tone": "warning",
+        "who": "Security",
+        "phase": "Approve",
+        "children": [
+         {
+          "type": "text",
+          "text": "Confirm it is signed.",
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "table",
+      "columns": [
+       "Rule",
+       "Governs"
+      ],
+      "rows": [
+       [
+        "Spec",
+        "One frozen version."
+       ],
+       [
+        "Needs review?",
+        ""
+       ],
+       [
+        "Security signed",
+        "Confirm it is signed."
+       ]
+      ],
+      "widths": [
+       1,
+       2
+      ],
+      "children": []
+     }
+    ]
+   }
+  }
+ ]
+}

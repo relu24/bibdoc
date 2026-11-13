@@ -1,0 +1,81 @@
+{
+ "name": "conditional-1",
+ "source": "if data.build.status == \"failed\" {\n  badge(\"failing\", tone: \"danger\")\n  list(\"Failures\") { for f in data.build.failures { item(f, f) } }\n} else {\n  badge(\"green\", tone: \"success\")\n}\n",
+ "data": {
+  "build": {
+   "status": "passed",
+   "failures": []
+  }
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "build": {
+     "status": "failed",
+     "failures": [
+      "Auth.Login_loops",
+      "Export.Is_fast"
+     ]
+    }
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "badge",
+      "text": "failing",
+      "tone": "danger",
+      "children": []
+     },
+     {
+      "type": "list",
+      "label": "Failures",
+      "_key": "failures",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "Auth.Login_loops",
+        "title": "Auth.Login_loops",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "Export.Is_fast",
+        "title": "Export.Is_fast",
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "op": "session",
+   "data": {
+    "build": {
+     "status": "passed",
+     "failures": []
+    }
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "badge",
+      "text": "green",
+      "tone": "success",
+      "children": []
+     }
+    ]
+   }
+  }
+ ]
+}

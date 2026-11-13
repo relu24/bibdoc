@@ -1,0 +1,93 @@
+{
+ "name": "counts",
+ "source": "let approved = data.receipts.filter(r => r.status == \"approved\")\nstat(\"Open\", data.receipts.count(r => r.status == \"open\"))\nstat(\"Approved\", approved.length)\nstat(\"Approved total\", approved.sum(r => r.amount))\n",
+ "data": {
+  "receipts": [
+   {
+    "id": "r1",
+    "status": "open",
+    "amount": 1200
+   },
+   {
+    "id": "r2",
+    "status": "approved",
+    "amount": 300
+   },
+   {
+    "id": "r3",
+    "status": "open",
+    "amount": 75
+   },
+   {
+    "id": "r4",
+    "status": "approved",
+    "amount": 990
+   },
+   {
+    "id": "r5",
+    "status": "approved",
+    "amount": 45
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "receipts": [
+     {
+      "id": "r1",
+      "status": "open",
+      "amount": 1200
+     },
+     {
+      "id": "r2",
+      "status": "approved",
+      "amount": 300
+     },
+     {
+      "id": "r3",
+      "status": "open",
+      "amount": 75
+     },
+     {
+      "id": "r4",
+      "status": "approved",
+      "amount": 990
+     },
+     {
+      "id": "r5",
+      "status": "approved",
+      "amount": 45
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "stat",
+      "label": "Open",
+      "value": 2,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Approved",
+      "value": 3,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Approved total",
+      "value": 1335,
+      "children": []
+     }
+    ]
+   }
+  }
+ ]
+}

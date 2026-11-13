@@ -1,0 +1,169 @@
+{
+ "name": "unread_and_rename",
+ "source": "let picked = list(\"Inbox\", selectable: true) {\n  for t in data.threads where t.unread { item(t.id, t.subject) }\n}\nif button(\"Archive selected\").clicked { call(\"mail.archive\", ids: picked.selected) }\n",
+ "data": {
+  "threads": [
+   {
+    "id": "t1",
+    "subject": "Contract v3",
+    "from": "Robin",
+    "unread": true
+   },
+   {
+    "id": "t2",
+    "subject": "CI failing on main",
+    "from": "Build bot",
+    "unread": true
+   },
+   {
+    "id": "t3",
+    "subject": "Lunch Friday?",
+    "from": "Jonas",
+    "unread": false
+   },
+   {
+    "id": "t4",
+    "subject": "Invoice 2211",
+    "from": "Ledgerly",
+    "unread": true
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "threads": [
+     {
+      "id": "t1",
+      "subject": "Contract v3",
+      "from": "Robin",
+      "unread": true
+     },
+     {
+      "id": "t2",
+      "subject": "CI failing on main",
+      "from": "Build bot",
+      "unread": true
+     },
+     {
+      "id": "t3",
+      "subject": "Lunch Friday?",
+      "from": "Jonas",
+      "unread": false
+     },
+     {
+      "id": "t4",
+      "subject": "Invoice 2211",
+      "from": "Ledgerly",
+      "unread": true
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "list",
+      "label": "Inbox",
+      "selectable": true,
+      "_key": "inbox",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "t1",
+        "title": "Contract v3",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "t2",
+        "title": "CI failing on main",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "t4",
+        "title": "Invoice 2211",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Archive selected",
+      "_key": "archiveselected#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "list",
+      "label": "Inbox",
+      "selectable": true,
+      "_key": "inbox",
+      "selected": [],
+      "children": [
+       {
+        "type": "item",
+        "id": "t1",
+        "title": "Contract v3",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "t2",
+        "title": "CI failing on main",
+        "children": []
+       },
+       {
+        "type": "item",
+        "id": "t4",
+        "title": "Invoice 2211",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "button",
+      "label": "Archive selected",
+      "_key": "archiveselected#0",
+      "children": []
+     }
+    ]
+   }
+  },
+  {
+   "op": "set",
+   "key": "inbox",
+   "value": [
+    "t1"
+   ]
+  },
+  {
+   "op": "click",
+   "key": "archiveselected#0",
+   "effects": [
+    {
+     "kind": "call",
+     "tool": "mail.archive",
+     "args": {
+      "ids": [
+       "t1"
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,231 @@
+{
+ "name": "admin_revoke",
+ "source": "for p in data.people {\n  card(p.name) {\n    badge(p.role, tone: p.role == \"admin\" ? \"accent\" : \"muted\")\n    if button(\"Message\").clicked { send(\"Hi {p.name}\") }\n    if p.role == \"admin\" {\n      if button(\"Revoke\").clicked { call(\"shop.tokens_revoke\", person: p.name) }\n    }\n  }\n}\n",
+ "data": {
+  "people": [
+   {
+    "name": "Alex",
+    "role": "admin"
+   },
+   {
+    "name": "Sam",
+    "role": "staff"
+   },
+   {
+    "name": "Kim",
+    "role": "admin"
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "people": [
+     {
+      "name": "Alex",
+      "role": "admin"
+     },
+     {
+      "name": "Sam",
+      "role": "staff"
+     },
+     {
+      "name": "Kim",
+      "role": "admin"
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "card",
+      "title": "Alex",
+      "children": [
+       {
+        "type": "badge",
+        "text": "admin",
+        "tone": "accent",
+        "children": []
+       },
+       {
+        "type": "button",
+        "label": "Message",
+        "_key": "message#0",
+        "children": []
+       },
+       {
+        "type": "button",
+        "label": "Revoke",
+        "_key": "revoke#0",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Sam",
+      "children": [
+       {
+        "type": "badge",
+        "text": "staff",
+        "tone": "muted",
+        "children": []
+       },
+       {
+        "type": "button",
+        "label": "Message",
+        "_key": "message#1",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Kim",
+      "children": [
+       {
+        "type": "badge",
+        "text": "admin",
+        "tone": "accent",
+        "children": []
+       },
+       {
+        "type": "button",
+        "label": "Message",
+        "_key": "message#2",
+        "children": []
+       },
+       {
+        "type": "button",
+        "label": "Revoke",
+        "_key": "revoke#1",
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "op": "click",
+   "key": "message#1",
+   "effects": [
+    {
+     "kind": "send",
+     "text": "Hi Sam"
+    }
+   ]
+  },
+  {
+   "op": "session",
+   "data": {
+    "people": [
+     {
+      "name": "Alex",
+      "role": "admin"
+     },
+     {
+      "name": "Sam",
+      "role": "staff"
+     },
+     {
+      "name": "Kim",
+      "role": "admin"
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "card",
+      "title": "Alex",
+      "children": [
+       {
+        "type": "badge",
+        "text": "admin",
+        "tone": "accent",
+        "children": []
+       },
+       {
+        "type": "button",
+        "label": "Message",
+        "_key": "message#0",
+        "children": []
+       },
+       {
+        "type": "button",
+        "label": "Revoke",
+        "_key": "revoke#0",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Sam",
+      "children": [
+       {
+        "type": "badge",
+        "text": "staff",
+        "tone": "muted",
+        "children": []
+       },
+       {
+        "type": "button",
+        "label": "Message",
+        "_key": "message#1",
+        "children": []
+       }
+      ]
+     },
+     {
+      "type": "card",
+      "title": "Kim",
+      "children": [
+       {
+        "type": "badge",
+        "text": "admin",
+        "tone": "accent",
+        "children": []
+       },
+       {
+        "type": "button",
+        "label": "Message",
+        "_key": "message#2",
+        "children": []
+       },
+       {
+        "type": "button",
+        "label": "Revoke",
+        "_key": "revoke#1",
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "op": "click",
+   "key": "revoke#1",
+   "effects": [
+    {
+     "kind": "call",
+     "tool": "shop.tokens_revoke",
+     "args": {
+      "person": "Kim"
+     }
+    }
+   ]
+  }
+ ]
+}

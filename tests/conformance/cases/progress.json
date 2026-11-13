@@ -1,0 +1,82 @@
+{
+ "name": "progress",
+ "source": "for m in data.milestones { progress(m.name, m.done, max: m.total) }\nstat(\"Overall\", round(100 * sum(data.milestones, m => m.done) / sum(data.milestones, m => m.total)))\n",
+ "data": {
+  "milestones": [
+   {
+    "name": "Prototype",
+    "done": 8,
+    "total": 10
+   },
+   {
+    "name": "Field study",
+    "done": 3,
+    "total": 12
+   },
+   {
+    "name": "CE file",
+    "done": 1,
+    "total": 20
+   }
+  ]
+ },
+ "steps": [
+  {
+   "op": "session",
+   "data": {
+    "milestones": [
+     {
+      "name": "Prototype",
+      "done": 8,
+      "total": 10
+     },
+     {
+      "name": "Field study",
+      "done": 3,
+      "total": 12
+     },
+     {
+      "name": "CE file",
+      "done": 1,
+      "total": 20
+     }
+    ]
+   }
+  },
+  {
+   "op": "frame",
+   "frame": {
+    "type": "root",
+    "children": [
+     {
+      "type": "progress",
+      "label": "Prototype",
+      "value": 8,
+      "max": 10,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "Field study",
+      "value": 3,
+      "max": 12,
+      "children": []
+     },
+     {
+      "type": "progress",
+      "label": "CE file",
+      "value": 1,
+      "max": 20,
+      "children": []
+     },
+     {
+      "type": "stat",
+      "label": "Overall",
+      "value": 29,
+      "children": []
+     }
+    ]
+   }
+  }
+ ]
+}
