@@ -68,6 +68,7 @@ public static class Values
         bool b => b ? 1 : 0,
         double d => d,
         string s when double.TryParse(s.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var d) => d,
+        Dim => throw new DocError("w and h are only known when the box is drawn: they take + - * / with numbers, not min, max, round or Math; give the box a size in px to compute with it"),
         _ => double.NaN,
     };
 

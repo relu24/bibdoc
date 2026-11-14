@@ -19,6 +19,7 @@ if button("Order").clicked { respond(units: units) }
   them, then checks the rules they do not reach.
 - **`docs/reference.md`**: the language as the interpreter runs it, for writers and
   agents: every widget, the primitives that are built, and the mistakes that recur.
+  `docs/widgets.bib.md` draws every widget, live, in bibmd.
   `skills/bib-blocks` is a Claude Code skill built on it (link it into
   `~/.claude/skills/`); it checks documents with bibmd's `md FILE --check`.
 - **`docs/proposal.md`**: the language (grammar, widgets, effects, rules that make

@@ -77,7 +77,8 @@ widget(args) { … }                       a container and the block inside it
   ```
 
 - No `while`, no recursion, no clock, no randomness, no I/O. A frame has a budget of
-  200,000 steps. `for` runs over a list that exists; for a range, write the list (`[0, 1, 2, 3]`).
+  200,000 steps for the whole document (every block together; one `line(…)` costs some 50). `for`
+  runs over a list that exists; for a range, write the list (`[0, 1, 2, 3]`).
 - A statement ends at a newline or `;`, except where the line obviously continues: after an
   operator, `?`, `:`, `=>`, `,` or an open bracket, or before a line starting with `.`, `?`,
   `:`, `&&`, `||`, `??`, an operator, `)` or `]`.
@@ -87,7 +88,8 @@ widget(args) { … }                       a container and the block inside it
 A pure subset of JavaScript.
 
 - Values: numbers, strings, `true`/`false`, `null`, lists `[a, ...xs]`, records
-  `{ a: 1, b, ...other }`, lambdas `v => v.price`, `(a, b) => { let s = a + b; return s }`.
+  `{ a: 1, b, ...other }`, lambdas `v => v.price`, `(a, b) => { let s = a + b; return s }`: a lambda's body holds only `let` and `return` (no `if`,
+  no reassigning: use `? :`, or a `fn`). Numbers may have an exponent: `3.156e7`.
 - Operators: `+ - * / %`, `== != === !==` (all compare by value), `< <= > >=`, `&& || !`,
   `??`, `a ? b : c`, `a.b`, `a?.b`, `a[i]`. Member access on null gives null.
 - **Strings:** `"…"` or `'…'`, with `{expr}` interpolated: `"Total: {total} EUR"`.
@@ -100,6 +102,8 @@ A pure subset of JavaScript.
   split slice replace`; numbers: `toFixed`.
 - **Globals:** `count(list)`, `sum(list, fn?)`, `min(list)`, `max(list)`, `round(x, digits?)`,
   `abs floor ceil`, `unique(list)`, `str(x)`, `num(s)`, `Math.round/floor/ceil/abs/min/max`,
+  `Math.sqrt/pow/exp/log/log10/log2/sin/cos/tan/asin/acos/atan/atan2/hypot/sign`, `Math.PI`, `Math.E`
+  (there is no `**`: write `Math.pow`),
   `Object.keys/values/entries`, `Infinity`, `fade(colour, alpha)`.
 - **Lists and records never change.** `push`, `pop`, `shift`, `unshift`, `splice` are
   errors: build a new one, `xs = [...xs, x]`.
@@ -111,6 +115,7 @@ A pure subset of JavaScript.
 
 A widget is a call: it draws where it is called and returns a value. Positional arguments
 first, in the order shown, named after. An unknown named argument is a warning.
+`widgets.bib.md` draws every one of them, live.
 
 **Text and figures** (return null)
 
@@ -212,7 +217,11 @@ box(dir: "row", gap: 8, padding: [6, 10], radius: 8, background: raised, border:
   `width: fill`) and draw in proportions of `w` and `h`, not in fixed pixels. Shapes:
   `rect(x, y, w, h, fill:, color:, width:, radius:)`, `circle(cx, cy, r, fill:, color:, width:)`,
   `line(x1, y1, x2, y2, color:, width:)`, `label(x, y, text, size:, color:, align:)`;
-  positions and sizes are positional, `width:` is the stroke's. Everything is clipped to the box.
+  positions and sizes are positional, `width:` is the stroke's. A label's `y` is the middle of its
+  line, and `align: start | center | end` puts its start, middle or end at `x`. Everything is
+  clipped to the box. `w` and `h` take `+ - * /` with numbers (and `+ -` with themselves),
+  nothing else: not `min`, `max`, `round`, `Math` or a comparison. To compute with the size,
+  give the box one in px.
 
   ```
   fn bar(label, value, top, tone: accent) {
@@ -250,6 +259,8 @@ box(dir: "row", gap: 8, padding: [6, 10], radius: 8, background: raised, border:
 | a slider without `step:` meant for counts | `step: 1` |
 | `max(...xs)` | `max(xs)` |
 | `draw(240, 120) { … }` | `box(width: 240, height: 120) { layer { … } }` |
+| `slider("w(AA)", …)` and `slider("w(aa)", …)` | one input: labels and ids are compared without case, spaces or punctuation; give each an `id:` that differs in letters (`--check` warns) |
+| `min([w, 100])`, `w < 200`, `Math.sqrt(w)` in a layer | a box with a size in px, and that number |
 
 ## Examples
 

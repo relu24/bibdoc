@@ -151,6 +151,7 @@ public sealed class Interpreter
     private FrameResult _result = null!;
     private List<List<FrameNode>> _stack = [];
     private readonly Dictionary<string, int> _occurrences = [];
+    private readonly Dictionary<string, string> _inputs = [];   // this run's input keys, and the label each came from
     private readonly HashSet<string> _calling = [];
     // The block each running fn of the document's was called with (null for a plain call), and
     // the one about to be handed to the next: slot() draws the innermost.
@@ -228,6 +229,7 @@ public sealed class Interpreter
         _state = state;
         _event = clicked;
         _occurrences.Clear();
+        _inputs.Clear();
         _calling.Clear();
         _slots.Clear();
         _given = null;
@@ -348,6 +350,15 @@ public sealed class Interpreter
         }
 
         object? ret = null;
+        if (Inputs.Contains(type) || type == "list")
+        {
+            // Labels are told apart without case, spaces or punctuation: two that differ only so are one input.
+            string called = Str(node.Props.GetValueOrDefault("id") ?? node.Props.GetValueOrDefault("label"));
+            string key = Norm(called);
+            if (_inputs.TryGetValue(key, out var first))
+                _result.Warnings.Add($"{type}: '{called}' is the same input as '{first}' (labels are compared without case, spaces or punctuation): give one an id:");
+            else _inputs[key] = called;
+        }
         if (Inputs.Contains(type))
         {
             node.Key = Norm(node.Props.GetValueOrDefault("id") ?? node.Props.GetValueOrDefault("label"));

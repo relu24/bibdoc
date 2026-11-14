@@ -295,7 +295,7 @@ public sealed class Evaluator(Budget budget)
                 return acc;
             }
             case "flatMap":
-                return xs.SelectMany(x => Invoke(f, x) is var r && r is List<object?> list ? list : [r]).ToList();
+                return xs.SelectMany((x, i) => Each(f, x, i, xs) is var r && r is List<object?> list ? list : [r]).ToList();
             case "push" or "pop" or "shift" or "unshift" or "splice":
                 throw new DocError($"lists cannot be changed ({name}); build a new one: [...xs, x], xs.concat([x]) or unique(xs)");
             case "sum": return xs.Sum(x => Num(f is null ? x : Invoke(f, x)));
@@ -331,7 +331,7 @@ public sealed class Evaluator(Budget budget)
             case "startsWith": return v.StartsWith(Str(a), StringComparison.Ordinal);
             case "endsWith": return v.EndsWith(Str(a), StringComparison.Ordinal);
             case "trim": return v.Trim();
-            case "split": return v.Split(Str(a)).Select(x => (object?)x).ToList();
+            case "split": return (Str(a) == "" ? v.Select(c => c.ToString()) : v.Split(Str(a))).Select(x => (object?)x).ToList();
             case "slice":
             {
                 int n = v.Length;
@@ -400,6 +400,23 @@ public sealed class Evaluator(Budget budget)
             ["abs"] = new Builtin(a => Math.Abs(Num(a.ElementAtOrDefault(0)))),
             ["min"] = new Builtin(MinMax(false)),
             ["max"] = new Builtin(MinMax(true)),
+            ["sign"] = new Builtin(a => (double)Math.Sign(Num(a.ElementAtOrDefault(0)))),
+            ["sqrt"] = new Builtin(a => Math.Sqrt(Num(a.ElementAtOrDefault(0)))),
+            ["pow"] = new Builtin(a => Math.Pow(Num(a.ElementAtOrDefault(0)), Num(a.ElementAtOrDefault(1)))),
+            ["exp"] = new Builtin(a => Math.Exp(Num(a.ElementAtOrDefault(0)))),
+            ["log"] = new Builtin(a => Math.Log(Num(a.ElementAtOrDefault(0)))),
+            ["log10"] = new Builtin(a => Math.Log10(Num(a.ElementAtOrDefault(0)))),
+            ["log2"] = new Builtin(a => Math.Log2(Num(a.ElementAtOrDefault(0)))),
+            ["sin"] = new Builtin(a => Math.Sin(Num(a.ElementAtOrDefault(0)))),
+            ["cos"] = new Builtin(a => Math.Cos(Num(a.ElementAtOrDefault(0)))),
+            ["tan"] = new Builtin(a => Math.Tan(Num(a.ElementAtOrDefault(0)))),
+            ["asin"] = new Builtin(a => Math.Asin(Num(a.ElementAtOrDefault(0)))),
+            ["acos"] = new Builtin(a => Math.Acos(Num(a.ElementAtOrDefault(0)))),
+            ["atan"] = new Builtin(a => Math.Atan(Num(a.ElementAtOrDefault(0)))),
+            ["atan2"] = new Builtin(a => Math.Atan2(Num(a.ElementAtOrDefault(0)), Num(a.ElementAtOrDefault(1)))),
+            ["hypot"] = new Builtin(a => Math.Sqrt(a.Sum(x => Num(x) * Num(x)))),
+            ["PI"] = Math.PI,
+            ["E"] = Math.E,
         },
         ["Object"] = new Dictionary<string, object?>
         {

@@ -58,6 +58,14 @@ public static class Lexer
                     j++;
                     while (j < src.Length && char.IsAsciiDigit(src[j])) j++;
                 }
+                // An exponent: 3.156e7, 1e-9.
+                int e = j < src.Length && src[j] is 'e' or 'E' ? j + 1 : -1;
+                if (e > 0 && e < src.Length && src[e] is '+' or '-') e++;
+                if (e > 0 && e < src.Length && char.IsAsciiDigit(src[e]))
+                {
+                    j = e;
+                    while (j < src.Length && char.IsAsciiDigit(src[j])) j++;
+                }
                 toks.Add(new(TokKind.Number, src[i..j], i));
                 i = j;
                 continue;

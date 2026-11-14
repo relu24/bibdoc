@@ -78,6 +78,16 @@ Check("recursion is refused",
 Check("a program that does not stop runs out of steps",
     ErrorOf("let xs = [1,2,3,4,5,6,7,8,9,10]\nfor a in xs { for b in xs { for c in xs { for d in xs { for e in xs { for f in xs { let x = a } } } } } }")?.Contains("budget") == true);
 Check("errors name the line", ErrorOf("text(\"a\")\ntext(nope)")?.Contains("line 2") == true, ErrorOf("text(\"a\")\ntext(nope)") ?? "");
+Check("Math has the functions of JavaScript's",
+    First("stat(\"x\", round(Math.sin(Math.PI / 2) + Math.sqrt(16) + Math.pow(2, 3) + Math.log(Math.exp(1)) + Math.atan2(0, 1), 6))")?.Props["value"] is 14d);
+Check("two inputs of one key are a warning",
+    new DocSession(["slider(\"w(AA)\", 0, 2)\nslider(\"w(aa)\", 0, 2)\nslider(\"w(BB)\", 0, 2)"], null).Frame().Warnings
+        is [var dup] && dup.Contains("'w(aa)' is the same input as 'w(AA)'"));
+Check("numbers may have an exponent", First("stat(\"x\", 3.156e7 + 2E-1 + 1e+2)")?.Props["value"] is 31560100.2d);
+Check("split on nothing gives the letters", First("chips(\"ABC\".split(\"\"))")?.Props["items"] is List<object?> { Count: 3 });
+Check("flatMap gives the index too", First("chips([5, 6].flatMap((n, j) => [j, n]))")?.Props["items"] is List<object?> { Count: 4 } fm && fm[2] is 1d);
+Check("w in min is an error, not a shape that is not drawn",
+    ErrorOf("box(width: 100, height: 50) { layer { circle(w / 2, 20, min([w, 10])) } }")?.Contains("w and h are only known") == true);
 Check("tone names are constants", First("badge(\"x\", tone: danger)")?.Props["tone"] as string == "danger");
 Check("a line continues before ?",
     First("let n = 2\nlet t = n > 1\n  ? \"many\"\n  : \"few\"\ntext(t)")?.Props["text"] as string == "many");
