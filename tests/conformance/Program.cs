@@ -97,6 +97,13 @@ foreach (var (what, src) in new[]
         ErrorOf(src)?.Contains("size budget") == true, ErrorOf(src) ?? "no error");
 // Shared lists: [n, n] again and again is 2^30 items as text, but only 60 in memory.
 const string Nested = Doubled + "let n = d.reduce((acc, k) => [acc, acc], [1])\n";
+Check("a block that runs out of room fails alone: the next one still draws",
+    new DocSession([Doubled + "let s = d.reduce((acc, k) => acc + acc, \"xxxxxxxx\")", "stat(\"Still here\", 42)"], null).Frame()
+        is { } both && both.Errors[0]?.Message.Contains("size budget") == true && both.Errors[1] is null
+        && both.Blocks[1].FirstOrDefault()?.Props["value"] is 42d);
+Check("a block that runs out of steps fails alone too",
+    new DocSession(["let xs = [1,2,3,4,5,6,7,8,9,10]\nfor a in xs { for b in xs { for c in xs { for d in xs { for e in xs { for f in xs { let x = a } } } } } }", "stat(\"Still here\", 42)"], null).Frame()
+        is { } steps && steps.Errors[0]?.Message.Contains("step budget") == true && steps.Errors[1] is null);
 Check("a list that holds itself many times over is written out cut short",
     First(Nested + "text(\"{n}\")")?.Text("text") is { } cut && cut.EndsWith('…') && cut.Length <= Values.ReadLimit + 1);
 Check("comparing two such lists runs out of room",

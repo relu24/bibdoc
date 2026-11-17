@@ -80,7 +80,8 @@ widget(args) { … }                       a container and the block inside it
   200,000 steps for the whole document (every block together; one `line(…)` costs some 50). `for`
   runs over a list that exists; for a range, write the list (`[0, 1, 2, 3]`). It also has a
   budget of 4,000,000 values built and gone through (list items, record fields, characters of
-  text): `[...acc, x]` in a `reduce` over 300 items takes some 45,000.
+  text): `[...acc, x]` in a `reduce` over 300 items takes some 45,000. A block that runs out
+  fails alone: the blocks after it start with what it started with.
 - A statement ends at a newline or `;`, except where the line obviously continues: after an
   operator, `?`, `:`, `=>`, `,` or an open bracket, or before a line starting with `.`, `?`,
   `:`, `&&`, `||`, `??`, an operator, `)` or `]`.

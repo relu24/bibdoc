@@ -54,6 +54,15 @@ public sealed class Budget
             throw new DocError($"size budget exhausted: a run builds and goes through at most {SizeLimit:N0} values (list items, record fields, characters)");
     }
 
+    /// <summary>What is left now, to give back to with <see cref="Restore"/>.</summary>
+    public (int Steps, long Room) Mark() => (_left, _room);
+
+    /// <summary>
+    /// Back to what was left at <paramref name="mark"/>: a block that failed gives back what it
+    /// spent, so one that runs away does not take the blocks after it with it.
+    /// </summary>
+    public void Restore((int Steps, long Room) mark) => (_left, _room) = mark;
+
     /// <summary>Equality by value, the values it looks at counted.</summary>
     public bool Eq(object? x, object? y)
     {

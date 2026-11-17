@@ -289,9 +289,12 @@ public sealed class Interpreter
             if (_blocks[i] is not { } stmts) continue;
             _stack = [_result.Blocks[i]];
             _source = _sources[i];
+            // A block that fails gives back the steps and size it spent: the next one starts
+            // with what this one started with, so a runaway block fails alone.
+            var mark = _budget.Mark();
             try { Block(stmts, scope); }
-            catch (DocError e) { _result.Errors[i] = e; }
-            catch (ReturnSignal) { _result.Errors[i] = new DocError("return outside fn"); }
+            catch (DocError e) { _result.Errors[i] = e; _budget.Restore(mark); }
+            catch (ReturnSignal) { _result.Errors[i] = new DocError("return outside fn"); _budget.Restore(mark); }
         }
         _result.Steps = _budget.Used;
         _result.Size = _budget.Sized;
