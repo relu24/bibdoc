@@ -75,8 +75,35 @@ Check("push names the alternative",
     ErrorOf("let xs = []\nxs.push(1)")?.Contains("[...xs, x]") == true, ErrorOf("let xs = []\nxs.push(1)") ?? "no error");
 Check("recursion is refused",
     ErrorOf("fn f(n) { return f(n) }\ntext(f(1))")?.Contains("may not recurse") == true, ErrorOf("fn f(n) { return f(n) }\ntext(f(1))") ?? "no error");
+Check("a lambda that calls itself is refused, not a crash",
+    ErrorOf("let f = x => f(x + 1)\nstat(\"n\", f(1))")?.Contains("f() calls itself") == true, ErrorOf("let f = x => f(x + 1)\nstat(\"n\", f(1))") ?? "no error");
+Check("a lambda called again after it returned is fine",
+    First("let inc = x => x + 1\nstat(\"n\", inc(inc(inc(1))) + [1, 2].map(inc).length)")?.Props["value"] is 6d);
 Check("a program that does not stop runs out of steps",
     ErrorOf("let xs = [1,2,3,4,5,6,7,8,9,10]\nfor a in xs { for b in xs { for c in xs { for d in xs { for e in xs { for f in xs { let x = a } } } } } }")?.Contains("budget") == true);
+// A document small in steps can still build something huge: each of these would take
+// gigabytes, or hours, without the size budget.
+const string Doubled = "let d = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]\n";
+foreach (var (what, src) in new[]
+{
+    ("a string doubled", Doubled + "let s = d.reduce((acc, k) => acc + acc, \"xxxxxxxx\")\ntext(\"{s.length}\")"),
+    ("a template doubled", Doubled + "let s = d.reduce((acc, k) => \"{acc}{acc}\", \"xxxxxxxx\")\ntext(\"{s.length}\")"),
+    ("a list spread into itself", Doubled + "let s = d.reduce((acc, k) => [...acc, ...acc], [1, 2, 3, 4])\ntext(\"{s.length}\")"),
+    ("a list concatenated to itself", Doubled + "let s = d.reduce((acc, k) => acc.concat(acc), [1, 2, 3, 4])\ntext(\"{s.length}\")"),
+    ("a big list flatMapped", Doubled + "let big = d.reduce((acc, k) => acc.length > 100000 ? acc : [...acc, ...acc], [1])\nlet s = d.flatMap(_ => big).flatMap(_ => big)\ntext(\"{s.length}\")"),
+    ("a big list searched in a loop", Doubled + "let big = d.reduce((acc, k) => acc.length > 100000 ? acc : [...acc, ...acc], [1])\nfor i in d { for j in d { let x = big.includes(2) } }"),
+})
+    Check($"{what} runs out of room, and does not take the machine with it",
+        ErrorOf(src)?.Contains("size budget") == true, ErrorOf(src) ?? "no error");
+// Shared lists: [n, n] again and again is 2^30 items as text, but only 60 in memory.
+const string Nested = Doubled + "let n = d.reduce((acc, k) => [acc, acc], [1])\n";
+Check("a list that holds itself many times over is written out cut short",
+    First(Nested + "text(\"{n}\")")?.Text("text") is { } cut && cut.EndsWith('…') && cut.Length <= Values.ReadLimit + 1);
+Check("comparing two such lists runs out of room",
+    ErrorOf(Nested + "let m = d.reduce((acc, k) => [acc, acc], [1])\ntext(\"{n == m}\")")?.Contains("size budget") == true);
+Check("toFixed takes at most 100 digits", First("text((1).toFixed(1000000000))")?.Text("text")?.Length == 102);
+Check("unique keeps the first of each, lists and records too",
+    First("text(\"{unique([1, \"1\", 1, [1], [1], {a: 1}, {a: 1}, null, null, true])}\")")?.Text("text") is "1,1,1,{'a': 1},null,true");
 Check("errors name the line", ErrorOf("text(\"a\")\ntext(nope)")?.Contains("line 2") == true, ErrorOf("text(\"a\")\ntext(nope)") ?? "");
 Check("Math has the functions of JavaScript's",
     First("stat(\"x\", round(Math.sin(Math.PI / 2) + Math.sqrt(16) + Math.pow(2, 3) + Math.log(Math.exp(1)) + Math.atan2(0, 1), 6))")?.Props["value"] is 14d);
@@ -88,6 +115,40 @@ Check("split on nothing gives the letters", First("chips(\"ABC\".split(\"\"))")?
 Check("flatMap gives the index too", First("chips([5, 6].flatMap((n, j) => [j, n]))")?.Props["items"] is List<object?> { Count: 4 } fm && fm[2] is 1d);
 Check("w in min is an error, not a shape that is not drawn",
     ErrorOf("box(width: 100, height: 50) { layer { circle(w / 2, 20, min([w, 10])) } }")?.Contains("w and h are only known") == true);
+string? TextOf(string src) => First(src)?.Props["text"] as string;
+Check("fmt groups thousands and keeps two decimals at most", TextOf("text(fmt(1234567.5))") == "1,234,567.5" && TextOf("text(fmt(0.125))") == "0.13" && TextOf("text(fmt(-3))") == "-3", TextOf("text(fmt(1234567.5))") ?? "");
+Check("fmt with digits keeps them", TextOf("text(fmt(2, 2))") == "2.00" && TextOf("text(fmt(1999.996, 2))") == "2,000.00");
+Check("fmt compact and sign", TextOf("text(fmt(1000, compact: true))") == "1k" && TextOf("text(fmt(3456789, compact: true))") == "3.5M"
+    && TextOf("text(fmt(5, sign: true))") == "+5" && TextOf("text(fmt(0, sign: true))") == "0", TextOf("text(fmt(3456789, compact: true))") ?? "");
+Check("a choice takes style: segmented", First("choice(\"Shape\", [\"a\", \"b\"], style: segmented)")?.Props["style"] as string == "segmented");
+{
+    const string tabsSrc = "let v = tabs(\"View\") {\n  tab(\"Chart\") { text(\"chart\") }\n  tab(\"Table\") { text(\"table\") }\n}\ntext(\"showing {v}\")";
+    var tabsDoc = new DocSession([tabsSrc], null);
+    var f1 = tabsDoc.Frame();
+    var t1 = f1.Blocks[0][0];
+    Check("tabs show the first tab, and run only its block",
+        f1.Errors[0] is null && t1.Props["value"] as string == "Chart" && t1.Children[0].Children.Count == 1 && t1.Children[1].Children.Count == 0
+        && f1.Blocks[0][1].Props["text"] as string == "showing Chart", f1.Errors[0]?.Message ?? "");
+    tabsDoc.Set(t1.Key!, "Table");
+    var f2 = tabsDoc.Frame();
+    Check("a picked tab shows instead", f2.Blocks[0][0].Children[1].Children.Count == 1 && f2.Blocks[0][0].Children[0].Children.Count == 0
+        && f2.Blocks[0][1].Props["text"] as string == "showing Table");
+    Check("a tab outside tabs is an error", ErrorOf("tab(\"x\") { text(\"y\") }")?.Contains("inside tabs") == true);
+}
+{
+    var plotted = new DocSession(["plot(y: [0, 1], log: \"x\") {\n  series(\"S\", [1, 10, 100], [\"0.5\", 0.25, 0.125], tone: accent, fill: true)\n  rule(y: 0.5, label: \"half\")\n  point(10, 0.25, label: \"here\")\n}"], null).Frame();
+    var plot = plotted.Blocks[0].FirstOrDefault();
+    Check("a plot holds its series, rules and points, with numbers for points",
+        plotted.Errors[0] is null && plot?.Type == "plot" && plot.Children.Select(c => c.Type).SequenceEqual(["series", "rule", "point"])
+        && plot.Children[0].Props["ys"] is List<object?> { Count: 3 } ys && ys[0] is 0.5d, plotted.Errors[0]?.Message ?? "");
+}
+Check("a series outside a plot is an error", ErrorOf("series(\"a\", [1], [2])")?.Contains("inside plot") == true);
+Check("a rule needs x or y", ErrorOf("plot { rule(label: \"x\") }")?.Contains("x: or y:") == true);
+Check("uneven xs and ys draw the shorter, with a warning",
+    new DocSession(["plot { series(\"a\", [1, 2, 3], [1, 2]) }"], null).Frame() is var uneven
+    && uneven.Blocks[0][0].Children[0].Props["xs"] is List<object?> { Count: 2 } && uneven.Warnings.Any(w => w.Contains("2 points drawn")));
+Check("bars take {label, value} records", First("bars([{label: \"a\", value: 3}])")?.Type == "bars" && ErrorOf("bars([1, 2])")?.Contains("{label, value}") == true);
+Check("a frame counts its steps", new DocSession(["let xs = [1, 2, 3].map(x => x * 2)\ntext(str(xs.length))"], null).Frame().Steps is > 0 and < 1000);
 Check("tone names are constants", First("badge(\"x\", tone: danger)")?.Props["tone"] as string == "danger");
 Check("a line continues before ?",
     First("let n = 2\nlet t = n > 1\n  ? \"many\"\n  : \"few\"\ntext(t)")?.Props["text"] as string == "many");

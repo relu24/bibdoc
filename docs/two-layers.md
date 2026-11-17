@@ -330,6 +330,26 @@ steps(ph.steps.map(s => ({...s, tone: tone(s.kind), phase: ph.name}))) {
 }
 ```
 
+### Which widgets move first
+
+The twelve showcase documents on bibmd.app (about 3,000 lines of bib) used `stat`, `text`,
+`slider`, `card`, `badge` and `grid` heavily, and these hardly or not at all:
+
+| Widget | Calls | Becomes |
+|---|---|---|
+| `heading` | 0 | a prelude `fn` over `text`; Markdown headings are what documents use, and they are in the page's contents |
+| `section` | 0 | a prelude `fn`: a caption over a `box` |
+| `column` | 2 | a prelude `fn` over `box` (which is a column by default) |
+| `chips` | 1 | a prelude `fn`: a wrapping row of mono pills |
+| `steps`, `step` | 2 | a prelude `fn` (`samples/steps-from-primitives.bib.md` already is one) |
+
+So these five are the first to leave the renderers for the prelude. They keep their names,
+arguments and frames, so no document changes; the reference stops teaching them first, and
+a renderer that draws them natively may stop. The widgets that stay native are the ones that
+need what bib cannot say: inputs (they hold state and take keys), `table` (its columns share
+a width), `markdown`, and the charts of `docs/charts.md` (a curve of hundreds of points is
+too many steps in bib).
+
 ### What a renderer still knows
 
 A renderer implements the primitives, and nothing of the standard library. The

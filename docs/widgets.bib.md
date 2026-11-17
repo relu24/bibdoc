@@ -112,6 +112,25 @@ steps {
 }
 ```
 
+## Charts
+
+`plot` draws its `series`, `dots`, `rule`s and `point`s on axes it works out; `bars` draws a
+bar per item. A curve is one call however many points it has.
+
+```bib
+let ts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40]
+let k = slider("Growth rate", 0.1, 0.5, value: 0.25, step: 0.01)
+let grown = ts.map(t => 100 / (1 + 99 * Math.exp(-k * t)))
+let half = ts.find(t => grown[t] >= 50) ?? 40
+plot(y: [0, 100], height: 200, xLabel: "week", yLabel: "% adopted") {
+  series("adopted", ts, grown, fill: true)
+  series("straight line", ts, ts.map(t => t * 2.5), tone: muted, width: 1.5)
+  rule(y: 50, label: "half", tone: muted)
+  point(half, grown[half], label: "week {half}")
+}
+bars(data.sales, unit: "units")
+```
+
 ## Inputs
 
 Inputs return their value, so what comes after them can use it.
@@ -155,6 +174,38 @@ row(fit: true) {
   button("Disabled", disabled: true)
 }
 text("Buttons clicked: {clicks}", tone: muted)
+```
+
+A `choice` with `style: segmented` sets a few short options side by side. An input's value is
+the state named by its key, so a button can `set` it: a preset.
+
+```bib
+let speed = choice("Speed", ["Slow", "Steady", "Fast"], style: segmented, value: "Steady")
+let rate = slider("Rate", 0, 100, value: 40, step: 1)
+row(fit: true) {
+  if button("Preset: calm", style: ghost).clicked { set("Rate", 10) }
+  if button("Preset: busy", style: ghost).clicked { set("Rate", 90) }
+}
+text("{speed} at {rate}", tone: muted)
+```
+
+`tabs` shows one panel at a time and returns the title of the tab that shows. Only that tab's
+block runs.
+
+```bib
+let view = tabs("View") {
+  tab("Summary") {
+    grid(columns: 3) {
+      stat("Total", fmt(1234567.5))
+      stat("Compact", fmt(1234567.5, compact: true))
+      stat("Change", fmt(4.25, sign: true), unit: "%")
+    }
+  }
+  tab("By region") {
+    table(["Region", "Sales"], data.sales.map(s => [s.label, fmt(s.value * 1000)]))
+  }
+}
+text("Showing {view}. fmt() writes numbers as people read them.", tone: muted)
 ```
 
 ## Your own pieces

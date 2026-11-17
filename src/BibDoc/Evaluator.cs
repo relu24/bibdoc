@@ -26,15 +26,41 @@ public sealed class Scope(Scope? parent = null, Dictionary<string, object?>? var
     public Scope Child(Dictionary<string, object?>? vars = null) => new(this, vars);
 }
 
-/// <summary>Every document must finish: a fixed number of steps per run.</summary>
+/// <summary>
+/// Every document must finish, and stay small: a fixed number of steps per run, and a fixed
+/// size of what the run builds and goes through, counted in values: a list item, a record
+/// field, a character of text.
+/// </summary>
 public sealed class Budget
 {
     public const int Limit = 200_000;
+    public const long SizeLimit = 4_000_000;
     private int _left = Limit;
-    public void Reset() => _left = Limit;
+    private long _room = SizeLimit;
+    public void Reset() { _left = Limit; _room = SizeLimit; }
+    /// <summary>The steps this run has taken so far.</summary>
+    public int Used => Limit - _left;
+    /// <summary>The size this run has built and gone through so far.</summary>
+    public long Sized => SizeLimit - Math.Max(_room, 0);
     public void Spend()
     {
         if (--_left < 0) throw new DocError("step budget exhausted");
+    }
+
+    /// <summary>Before building or going through that many values.</summary>
+    public void Size(long n)
+    {
+        if ((_room -= n) < 0)
+            throw new DocError($"size budget exhausted: a run builds and goes through at most {SizeLimit:N0} values (list items, record fields, characters)");
+    }
+
+    /// <summary>Equality by value, the values it looks at counted.</summary>
+    public bool Eq(object? x, object? y)
+    {
+        long left = Math.Max(_room, 0) + 1;
+        bool eq = Values.Eq(x, y, ref left);
+        Size(Math.Max(_room, 0) + 1 - left);
+        return eq;
     }
 }
 
@@ -43,24 +69,36 @@ public sealed class Closure(Lambda lambda, Scope scope, Evaluator ev) : Callable
 {
     public override int Arity => lambda.Params.Count;
 
+    /// <summary>Called, and not yet returned: a call now would be the lambda calling itself.</summary>
+    public bool Running => ev.Running.Contains(lambda);
+
     public override object? Invoke(IReadOnlyList<object?> args, IReadOnlyDictionary<string, object?>? named)
     {
-        var vars = new Dictionary<string, object?>();
-        for (int i = 0; i < lambda.Params.Count && i < args.Count; i++) vars[lambda.Params[i]] = args[i];
-        var s = scope.Child(vars);
-        if (lambda.Body is { } body) return ev.Eval(body, s);
-        foreach (var st in lambda.Block!)
+        // As a fn may not: a lambda that called itself would go on until the stack, not the budget, ran out.
+        if (!ev.Running.Add(lambda)) throw new DocError("a function calls itself; documents may not recurse");
+        try
         {
-            if (st.Name is { } name) s.Vars[name] = ev.Eval(st.Value, s);
-            else return ev.Eval(st.Value, s);
+            var vars = new Dictionary<string, object?>();
+            for (int i = 0; i < lambda.Params.Count && i < args.Count; i++) vars[lambda.Params[i]] = args[i];
+            var s = scope.Child(vars);
+            if (lambda.Body is { } body) return ev.Eval(body, s);
+            foreach (var st in lambda.Block!)
+            {
+                if (st.Name is { } name) s.Vars[name] = ev.Eval(st.Value, s);
+                else return ev.Eval(st.Value, s);
+            }
+            return null;
         }
-        return null;
+        finally { ev.Running.Remove(lambda); }
     }
 }
 
 /// <summary>Evaluates expressions: the pure, JavaScript-shaped part of the language.</summary>
 public sealed class Evaluator(Budget budget)
 {
+    /// <summary>The lambdas called and not yet returned, each by where it is written.</summary>
+    internal readonly HashSet<Lambda> Running = new(ReferenceEqualityComparer.Instance);
+
     public object? Eval(Expr e, Scope s)
     {
         budget.Spend();
@@ -71,7 +109,12 @@ public sealed class Evaluator(Budget budget)
             {
                 if (t.Parts.Count == 0) return "";
                 var sb = new System.Text.StringBuilder();
-                foreach (var p in t.Parts) sb.Append(p is string str ? str : Str(Eval((Expr)p, s)));
+                foreach (var p in t.Parts)
+                {
+                    string part = p is string str ? str : Str(Eval((Expr)p, s));
+                    budget.Size(part.Length);
+                    sb.Append(part);
+                }
                 return sb.ToString();
             }
             case NameRef n: return s.Lookup(n.Name);
@@ -80,8 +123,8 @@ public sealed class Evaluator(Budget budget)
                 var list = new List<object?>();
                 foreach (var (spread, x) in a.Items)
                 {
-                    if (!spread) { list.Add(Eval(x, s)); continue; }
-                    if (Eval(x, s) is List<object?> xs) list.AddRange(xs);
+                    if (!spread) { budget.Size(1); list.Add(Eval(x, s)); continue; }
+                    if (Eval(x, s) is List<object?> xs) { budget.Size(xs.Count); list.AddRange(xs); }
                 }
                 return list;
             }
@@ -90,9 +133,12 @@ public sealed class Evaluator(Budget budget)
                 var rec = new Dictionary<string, object?>();
                 foreach (var (key, x) in o.Pairs)
                 {
-                    if (key is not null) { rec[key] = Eval(x, s); continue; }
+                    if (key is not null) { budget.Size(1); rec[key] = Eval(x, s); continue; }
                     if (Eval(x, s) is Dictionary<string, object?> other)
+                    {
+                        budget.Size(other.Count);
                         foreach (var (k, v) in other) rec[k] = v;
+                    }
                 }
                 return rec;
             }
@@ -172,11 +218,20 @@ public sealed class Evaluator(Budget budget)
         if (l is Dim || r is Dim) return DimOp(b.Op, l, r);
         switch (b.Op)
         {
-            case "==": return Eq(l, r);
-            case "!=": return !Eq(l, r);
+            case "==": return budget.Eq(l, r);
+            case "!=": return !budget.Eq(l, r);
             case "+":
-                if (l is string || r is string) return Str(l) + Str(r);
-                if (l is List<object?> la && r is List<object?> lb) return la.Concat(lb).ToList();
+                if (l is string || r is string)
+                {
+                    string sl = Str(l), sr = Str(r);
+                    budget.Size(sl.Length + sr.Length);
+                    return sl + sr;
+                }
+                if (l is List<object?> la && r is List<object?> lb)
+                {
+                    budget.Size(la.Count + lb.Count);
+                    return la.Concat(lb).ToList();
+                }
                 return Num(l) + Num(r);
             case "<" or "<=" or ">" or ">=":
             {
@@ -214,7 +269,7 @@ public sealed class Evaluator(Budget budget)
                 case List<object?> xs: return ListMethod(xs, method, args);
                 case string str: return StringMethod(str, method, args);
                 case double d when method == "toFixed":
-                    return d.ToString("F" + (args.Count > 0 ? (int)Num(args[0]) : 0), CultureInfo.InvariantCulture);
+                    return d.ToString("F" + (args.Count > 0 ? Math.Clamp((int)Num(args[0]), 0, 100) : 0), CultureInfo.InvariantCulture);
                 case Dictionary<string, object?> o when o.TryGetValue(method, out var f) && f is Callable fn:
                     return fn.Invoke(args, null);
             }
@@ -229,6 +284,7 @@ public sealed class Evaluator(Budget budget)
             foreach (var (k, v) in c.Named) named[k] = Eval(v, s);
         }
         if (callee is not Callable call) throw new DocError($"'{Str(callee)}' is not a function");
+        if (call is Closure { Running: true } && c.Callee is NameRef self) throw new DocError($"{self.Name}() calls itself; documents may not recurse");
         if (named is not null && !call.TakesNamed) throw new DocError("named arguments only go to widgets");
         return call.Invoke(positional, named);
     }
@@ -250,7 +306,68 @@ public sealed class Evaluator(Budget budget)
             _ => Invoke(f, x, (double)i, xs),
         };
 
-    public static object? ListMethod(List<object?> xs, string name, List<object?> args)
+    // What a list's method builds or goes through is counted, item by item; what a callback
+    // does is counted as it runs.
+    private object? ListMethod(List<object?> xs, string name, List<object?> args)
+    {
+        var f = args.Count > 0 ? args[0] : null;
+        switch (name)
+        {
+            case "map" or "filter" or "reverse" or "sort" or "sum" or "count":
+                budget.Size(xs.Count);
+                break;
+            case "join":
+            {
+                string sep = args.Count > 0 ? Str(f) : ",";
+                var sb = new System.Text.StringBuilder();
+                for (int i = 0; i < xs.Count; i++)
+                {
+                    string item = Str(xs[i]);
+                    budget.Size(item.Length + (i > 0 ? sep.Length : 0) + 1);
+                    if (i > 0) sb.Append(sep);
+                    sb.Append(item);
+                }
+                return sb.ToString();
+            }
+            case "slice":
+            {
+                var part = Slice(xs, args);
+                budget.Size(part.Count);
+                return part;
+            }
+            case "concat":
+            {
+                var list = new List<object?>(xs);
+                budget.Size(xs.Count);
+                foreach (var a in args)
+                {
+                    if (a is List<object?> more) { budget.Size(more.Count); list.AddRange(more); }
+                    else { budget.Size(1); list.Add(a); }
+                }
+                return list;
+            }
+            case "flatMap":
+            {
+                var list = new List<object?>();
+                for (int i = 0; i < xs.Count; i++)
+                {
+                    var r = Each(f, xs[i], i, xs);
+                    if (r is List<object?> more) { budget.Size(more.Count); list.AddRange(more); }
+                    else { budget.Size(1); list.Add(r); }
+                }
+                return list;
+            }
+            case "includes":
+                foreach (var x in xs) if (budget.Eq(x, f)) return true;
+                return false;
+            case "indexOf":
+                for (int i = 0; i < xs.Count; i++) if (budget.Eq(xs[i], f)) return (double)i;
+                return -1d;
+        }
+        return Methods(xs, name, args);
+    }
+
+    private static object? Methods(List<object?> xs, string name, List<object?> args)
     {
         var f = args.Count > 0 ? args[0] : null;
         switch (name)
@@ -269,18 +386,6 @@ public sealed class Evaluator(Budget budget)
             case "every":
                 for (int i = 0; i < xs.Count; i++) if (!Truthy(Each(f, xs[i], i, xs))) return false;
                 return true;
-            case "includes": return xs.Any(x => Eq(x, f));
-            case "indexOf":
-                for (int i = 0; i < xs.Count; i++) if (Eq(xs[i], f)) return (double)i;
-                return -1d;
-            case "join": return string.Join(args.Count > 0 ? Str(f) : ",", xs.Select(Str));
-            case "slice": return Slice(xs, args);
-            case "concat":
-            {
-                var list = new List<object?>(xs);
-                foreach (var a in args) { if (a is List<object?> more) list.AddRange(more); else list.Add(a); }
-                return list;
-            }
             case "reverse": { var list = new List<object?>(xs); list.Reverse(); return list; }
             case "sort":
                 return f is null
@@ -294,8 +399,6 @@ public sealed class Evaluator(Budget budget)
                     acc = arity switch { 2 => Invoke(f, acc, xs[i]), 3 => Invoke(f, acc, xs[i], (double)i), _ => Invoke(f, acc, xs[i], (double)i, xs) };
                 return acc;
             }
-            case "flatMap":
-                return xs.SelectMany((x, i) => Each(f, x, i, xs) is var r && r is List<object?> list ? list : [r]).ToList();
             case "push" or "pop" or "shift" or "unshift" or "splice":
                 throw new DocError($"lists cannot be changed ({name}); build a new one: [...xs, x], xs.concat([x]) or unique(xs)");
             case "sum": return xs.Sum(x => Num(f is null ? x : Invoke(f, x)));
@@ -320,8 +423,10 @@ public sealed class Evaluator(Budget budget)
         return end > start ? xs.GetRange(start, end - start) : [];
     }
 
-    public static object? StringMethod(string v, string name, List<object?> args)
+    // A string's method goes through the string, and builds no more than it plus what it is given.
+    private object? StringMethod(string v, string name, List<object?> args)
     {
+        budget.Size(v.Length + args.Sum(x => x is string sx ? sx.Length : 1));
         var a = args.Count > 0 ? args[0] : null;
         switch (name)
         {
@@ -357,23 +462,63 @@ public sealed class Evaluator(Budget budget)
         return Math.Floor(x * p + 0.5) / p;
     }
 
-    private static List<object?> Unique(object? v)
+    // Numbers, text, true, false and null are told apart by a set; lists and records each
+    // against the others kept so far, counted.
+    private List<object?> Unique(object? v)
     {
         var output = new List<object?>();
-        if (v is List<object?> xs)
-            foreach (var x in xs) if (!output.Any(y => Eq(x, y))) output.Add(x);
+        if (v is not List<object?> xs) return output;
+        budget.Size(xs.Count);
+        var seen = new HashSet<(int, object?)>();
+        var kept = new List<object?>();
+        foreach (var x in xs)
+        {
+            bool fresh = x switch
+            {
+                null => seen.Add((0, null)),
+                bool b => seen.Add((1, b)),
+                double d => double.IsNaN(d) || seen.Add((2, d)),
+                string str => seen.Add((3, str)),
+                _ => !kept.Any(y => budget.Eq(x, y)),
+            };
+            if (!fresh) continue;
+            if (x is List<object?> or Dictionary<string, object?>) kept.Add(x);
+            output.Add(x);
+        }
         return output;
     }
 
-    private static Func<IReadOnlyList<object?>, object?> MinMax(bool max) => args =>
+    private Func<IReadOnlyList<object?>, object?> MinMax(bool max) => args =>
     {
         IEnumerable<object?> xs = args.Count == 1 && args[0] is List<object?> l ? l : args;
+        budget.Size(args.Count == 1 && args[0] is List<object?> counted ? counted.Count : args.Count);
         var nums = xs.Select(Num).ToList();
         if (nums.Count == 0) return null;
         return max ? nums.Max() : nums.Min();
     };
 
-    public static Dictionary<string, object?> Builtins() => new()
+    // A number as people read it: 1,234,567.5. With digits, that many decimals, kept; without, up to
+    // two, trailing zeros dropped. compact: 1.2k, 3.4M, 5.6B (up to one decimal, unless digits says).
+    // sign: a + before a positive number.
+    public static string Fmt(double x, int? digits, bool compact, bool sign)
+    {
+        if (double.IsNaN(x)) return "NaN";
+        if (double.IsInfinity(x)) return x > 0 ? "∞" : "-∞";
+        string suffix = "";
+        if (compact)
+        {
+            double ax = Math.Abs(x);
+            (double div, suffix) = ax >= 1e12 ? (1e12, "T") : ax >= 1e9 ? (1e9, "B") : ax >= 1e6 ? (1e6, "M") : ax >= 1e3 ? (1e3, "k") : (1, "");
+            x /= div;
+        }
+        int d = Math.Clamp(digits ?? (suffix == "" ? 2 : 1), 0, 15);
+        string text = Math.Round(x, d, MidpointRounding.AwayFromZero).ToString("N" + d, CultureInfo.InvariantCulture);
+        if (digits is null && text.Contains('.')) text = text.TrimEnd('0').TrimEnd('.');
+        if (text is "-0" || text.StartsWith("-0") && text.Trim('-', '0', '.', ',').Length == 0) text = text[1..];
+        return (sign && x > 0 && text.Trim('0', '.', ',').Length > 0 ? "+" : "") + text + suffix;
+    }
+
+    public Dictionary<string, object?> Builtins() => new()
     {
         ["count"] = new Builtin(a => a.Count > 0 && a[0] is List<object?> xs
             ? ListMethod(xs, "count", a.Count > 1 ? [a[1]] : [])
@@ -391,6 +536,8 @@ public sealed class Evaluator(Budget budget)
         ["num"] = new Builtin(a => Num(a.ElementAtOrDefault(0))),
         ["Number"] = new Builtin(a => Num(a.ElementAtOrDefault(0))),
         ["Infinity"] = double.PositiveInfinity,
+        ["fmt"] = new NamedBuiltin((a, named) => Fmt(Num(a.ElementAtOrDefault(0)), a.Count > 1 ? (int?)Num(a[1]) : null,
+            Truthy(named.GetValueOrDefault("compact")), Truthy(named.GetValueOrDefault("sign")))),
         ["fade"] = new Builtin(a => $"{Str(a.ElementAtOrDefault(0))}@{NumStr(a.Count > 1 ? Num(a[1]) : 0.15)}", 2),
         ["Math"] = new Dictionary<string, object?>
         {

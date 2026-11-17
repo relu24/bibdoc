@@ -37,12 +37,33 @@ public sealed class FrameNode(string type)
         sb.Append("]}");
     }
 
-    public static object? Clean(object? v) => v switch
+    public static object? Clean(object? v)
     {
-        Dictionary<string, object?> o => o.Where(kv => kv.Value is not null).ToDictionary(kv => kv.Key, kv => Clean(kv.Value)),
-        List<object?> xs => xs.Select(Clean).ToList(),
-        _ => v,
-    };
+        int left = Values.ReadLimit;
+        return Clean(v, ref left);
+    }
+
+    // Past ReadLimit values, the rest is left as it is: a list that holds itself many times over is not copied out.
+    private static object? Clean(object? v, ref int left)
+    {
+        if (--left < 0) return v;
+        switch (v)
+        {
+            case Dictionary<string, object?> o:
+            {
+                var clean = new Dictionary<string, object?>();
+                foreach (var (k, x) in o) if (x is not null) clean[k] = Clean(x, ref left);
+                return clean;
+            }
+            case List<object?> xs:
+            {
+                var clean = new List<object?>(xs.Count);
+                foreach (var x in xs) clean.Add(Clean(x, ref left));
+                return clean;
+            }
+            default: return v;
+        }
+    }
 }
 
 /// <summary>What a click asked the world to do: call a tool, send a message, or respond with fields.</summary>
@@ -81,6 +102,10 @@ public sealed class FrameResult
     /// <summary>The states a click's run set, by name: the document changing itself, which the session keeps.</summary>
     public Dictionary<string, object?> Sets { get; } = [];
     public List<string> Warnings { get; } = [];
+    /// <summary>The steps the run took, of <see cref="Budget.Limit"/>.</summary>
+    public int Steps { get; set; }
+    /// <summary>The values the run built and went through, of <see cref="Budget.SizeLimit"/>.</summary>
+    public long Size { get; set; }
 }
 
 /// <summary>
@@ -99,6 +124,10 @@ public sealed class Interpreter
         ["button"] = ["label"], ["choice"] = ["label", "options"], ["slider"] = ["label", "min", "max"],
         ["input"] = ["label"], ["toggle"] = ["label"], ["checklist"] = ["label", "options"],
         ["grid"] = [], ["steps"] = [], ["step"] = ["n", "title"], ["chips"] = ["items"],
+        ["tabs"] = ["label"], ["tab"] = ["title"],
+        // charts (docs/charts.md)
+        ["plot"] = [], ["series"] = ["label", "xs", "ys"], ["dots"] = ["label", "xs", "ys"], ["rule"] = [],
+        ["point"] = ["x", "y"], ["bars"] = ["items"],
         // primitives (docs/two-layers.md)
         ["box"] = [], ["layer"] = [], ["draw"] = ["width", "height"],
         ["line"] = ["x1", "y1", "x2", "y2"], ["rect"] = ["x", "y", "w", "h"], ["circle"] = ["cx", "cy", "r"], ["label"] = ["x", "y", "text"],
@@ -122,12 +151,17 @@ public sealed class Interpreter
         ["kv"] = ["items"], ["table"] = ["columns", "rows", "widths"],
         ["list"] = ["id", "label", "selectable"], ["item"] = ["id", "title", "subtitle", "badge", "tone"],
         ["button"] = ["label", "style", "disabled"],
-        ["choice"] = ["id", "label", "options", "value"], ["slider"] = ["id", "label", "min", "max", "value", "step"],
+        ["choice"] = ["id", "label", "options", "value", "style"],
+        ["tabs"] = ["id", "label", "value"], ["tab"] = ["title"],
+        ["plot"] = ["x", "y", "height", "xLabel", "yLabel", "log"],
+        ["series"] = ["label", "xs", "ys", "tone", "fill", "width"], ["dots"] = ["label", "xs", "ys", "tone", "r"],
+        ["rule"] = ["x", "y", "label", "tone"], ["point"] = ["x", "y", "label", "tone"],
+        ["bars"] = ["items", "unit", "max", "dir", "height"], ["slider"] = ["id", "label", "min", "max", "value", "step"],
         ["input"] = ["id", "label", "value", "multiline", "placeholder"], ["toggle"] = ["id", "label", "value"],
         ["checklist"] = ["id", "label", "options", "value"],
     };
 
-    public static readonly HashSet<string> Containers = ["card", "section", "row", "column", "list", "grid", "steps", "step", "box", "layer", "draw"];
+    public static readonly HashSet<string> Containers = ["card", "section", "row", "column", "list", "grid", "steps", "step", "box", "layer", "draw", "tabs", "tab", "plot"];
     public static readonly HashSet<string> Inputs = ["choice", "slider", "input", "toggle", "checklist"];
     // Names a document writes as values: tones and colour roles, and the style table's words.
     private static readonly string[] Names =
@@ -135,7 +169,7 @@ public sealed class Interpreter
         "neutral", "muted", "success", "warning", "danger", "accent", "primary", "ghost",
         "ink", "faint", "surface", "raised", "border", "start", "center", "end",
         "between", "fill", "fit", "body", "display", "mono", "bold", "italic", "regular",
-        "low", "high", "sm", "md", "lg", "xl",
+        "low", "high", "sm", "md", "lg", "xl", "segmented",
     ];
 
     private readonly IReadOnlyList<IReadOnlyList<Stmt>?> _blocks;
@@ -150,6 +184,12 @@ public sealed class Interpreter
     private string? _event;
     private FrameResult _result = null!;
     private List<List<FrameNode>> _stack = [];
+    private readonly List<Tabbed> _tabs = [];   // the tabs being drawn, innermost last
+    private int _plots;                          // plots being drawn: what goes in one needs one around it
+    public const int MaxPoints = 2000;           // a series' points, at most
+
+    // A tabs container while its block runs: the title of the tab that shows.
+    private sealed class Tabbed { public string? Active; }
     private readonly Dictionary<string, int> _occurrences = [];
     private readonly Dictionary<string, string> _inputs = [];   // this run's input keys, and the label each came from
     private readonly HashSet<string> _calling = [];
@@ -230,6 +270,8 @@ public sealed class Interpreter
         _event = clicked;
         _occurrences.Clear();
         _inputs.Clear();
+        _tabs.Clear();
+        _plots = 0;
         _calling.Clear();
         _slots.Clear();
         _given = null;
@@ -238,7 +280,7 @@ public sealed class Interpreter
             Blocks = Enumerable.Range(0, _blocks.Count).Select(_ => new List<FrameNode>()).ToArray(),
             Errors = (DocError?[])_parseErrors.Clone(),
         };
-        var root = new Scope(null, Evaluator.Builtins());
+        var root = new Scope(null, _ev.Builtins());
         var vars = new Dictionary<string, object?> { ["data"] = data };
         foreach (var (k, v) in Widgets()) vars[k] = v;
         var scope = root.Child(vars);
@@ -251,6 +293,8 @@ public sealed class Interpreter
             catch (DocError e) { _result.Errors[i] = e; }
             catch (ReturnSignal) { _result.Errors[i] = new DocError("return outside fn"); }
         }
+        _result.Steps = _budget.Used;
+        _result.Size = _budget.Sized;
         return _result;
     }
 
@@ -322,6 +366,25 @@ public sealed class Interpreter
             throw new DocError($"{kind}() reaches outside the document, and this one may not; a button here can set() the document's own state");
     }
 
+    // A series' xs and ys as numbers, as many as both have (and MaxPoints at most). A point that
+    // is not a number (NaN, infinite) is kept: the renderer breaks the line there.
+    private void Points(FrameNode node)
+    {
+        if (node.Props.GetValueOrDefault("xs") is not List<object?> xs || node.Props.GetValueOrDefault("ys") is not List<object?> ys)
+            throw new DocError($"{node.Type}() takes two lists of numbers, xs and ys");
+        int n = Math.Min(xs.Count, ys.Count);
+        if (xs.Count != ys.Count)
+            _result.Warnings.Add($"{node.Type}: xs has {xs.Count} numbers and ys {ys.Count}: {n} points drawn");
+        if (n > MaxPoints)
+        {
+            _result.Warnings.Add($"{node.Type}: {n} points, {MaxPoints} drawn");
+            n = MaxPoints;
+        }
+        _budget.Size(2L * n);
+        node.Props["xs"] = xs.Take(n).Select(x => (object?)Num(x)).ToList();
+        node.Props["ys"] = ys.Take(n).Select(y => (object?)Num(y)).ToList();
+    }
+
     private static object? InputDefault(string type, Dictionary<string, object?> props)
     {
         if (props.TryGetValue("value", out var v) && v is not null) return v;
@@ -350,7 +413,7 @@ public sealed class Interpreter
         }
 
         object? ret = null;
-        if (Inputs.Contains(type) || type == "list")
+        if (Inputs.Contains(type) || type is "list" or "tabs")
         {
             // Labels are told apart without case, spaces or punctuation: two that differ only so are one input.
             string called = Str(node.Props.GetValueOrDefault("id") ?? node.Props.GetValueOrDefault("label"));
@@ -385,13 +448,58 @@ public sealed class Interpreter
             };
         }
 
+        // Charts (docs/charts.md): their marks go in a plot, a series' points are numbers.
+        if (type is "series" or "dots" or "rule" or "point" && _plots == 0)
+            throw new DocError($"{type}() goes inside plot {{ }}");
+        if (type is "series" or "dots") Points(node);
+        if (type == "rule" && node.Props.GetValueOrDefault("x") is null && node.Props.GetValueOrDefault("y") is null)
+            throw new DocError("rule() takes x: or y:");
+        if (type == "bars")
+        {
+            if (node.Props.GetValueOrDefault("items") is not List<object?> bars)
+                throw new DocError("bars() takes a list of {label, value}");
+            if (bars.FirstOrDefault(b => b is not Dictionary<string, object?> r || !r.ContainsKey("value")) is { } bad)
+                throw new DocError($"bars(): each item is a {{label, value}} record, not {Str(bad)}");
+        }
+
+        // Tabs are an input whose value is the title of the tab that shows (the first, until one is
+        // picked); only that tab's block runs.
+        Tabbed? tabbed = null;
+        bool runs = true;
+        if (type == "tabs")
+        {
+            node.Key = Norm(node.Props.GetValueOrDefault("id") ?? node.Props.GetValueOrDefault("label"));
+            tabbed = new Tabbed { Active = _state.TryGetValue(node.Key, out var st) ? Str(st) : node.Props.GetValueOrDefault("value") is { } v ? Str(v) : null };
+        }
+        else if (type == "tab")
+        {
+            if (_tabs.Count == 0) throw new DocError("tab() goes inside tabs { }");
+            var within = _tabs[^1];
+            string title = Str(node.Props.GetValueOrDefault("title"));
+            within.Active ??= title;
+            runs = title == within.Active;
+            node.Props["active"] = runs;
+        }
+
         _stack[^1].Add(node);
         if (block is not null)
         {
             if (!Containers.Contains(type)) throw new DocError($"{type}() does not take a {{ block }}");
+            if (tabbed is not null) _tabs.Add(tabbed);
+            if (type == "plot") _plots++;
             _stack.Add(node.Children);
-            try { block(); }
-            finally { _stack.RemoveAt(_stack.Count - 1); }
+            try { if (runs) block(); }
+            finally
+            {
+                _stack.RemoveAt(_stack.Count - 1);
+                if (tabbed is not null) _tabs.RemoveAt(_tabs.Count - 1);
+                if (type == "plot") _plots--;
+            }
+        }
+        if (tabbed is not null)
+        {
+            node.Props["value"] = tabbed.Active;
+            ret = tabbed.Active;
         }
         if (type == "list" && ret is Dictionary<string, object?> r)
             r["count"] = (double)node.Children.Count(c => c.Type == "item");

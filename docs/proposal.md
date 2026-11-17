@@ -204,6 +204,7 @@ While a document streams in (an agent writing it), the host runs the statements 
 - **`tests/conformance`**: the shared cases, each a document, data and a script of events with the frames and effects expected, and the runner that replays them against `BibDoc`. A second interpreter passes when it gives the same JSON.
 - **`docs/proposal.md`**: this document, the language's specification until it is split into a reference.
 - **`docs/two-layers.md`**: the next design, not built yet. Primitives (`box`, `text`, inputs, drawing) with a fixed style vocabulary on bibui's box model, a theme, `state()` and events beyond clicks, and the widgets of this document rewritten as a standard library in bib. What artifacts get from CSS and JavaScript, without what makes them unsafe or unreproducible.
+- **`docs/charts.md`**: built. `plot` (series, dots, rules, points, log axes) and `bars`, native so a curve costs one call, from what the showcase documents drew by hand.
 - **`bibdoc.js`** (to come): the browser interpreter and HTML renderer, here so that it versions with the language.
 
 The renderers live with their apps: bibmd draws documents with bibui, and references this repository as a sibling checkout (`../bibdoc`).

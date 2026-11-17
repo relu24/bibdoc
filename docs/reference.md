@@ -78,7 +78,9 @@ widget(args) { … }                       a container and the block inside it
 
 - No `while`, no recursion, no clock, no randomness, no I/O. A frame has a budget of
   200,000 steps for the whole document (every block together; one `line(…)` costs some 50). `for`
-  runs over a list that exists; for a range, write the list (`[0, 1, 2, 3]`).
+  runs over a list that exists; for a range, write the list (`[0, 1, 2, 3]`). It also has a
+  budget of 4,000,000 values built and gone through (list items, record fields, characters of
+  text): `[...acc, x]` in a `reduce` over 300 items takes some 45,000.
 - A statement ends at a newline or `;`, except where the line obviously continues: after an
   operator, `?`, `:`, `=>`, `,` or an open bracket, or before a line starting with `.`, `?`,
   `:`, `&&`, `||`, `??`, an operator, `)` or `]`.
@@ -105,6 +107,10 @@ A pure subset of JavaScript.
   `Math.sqrt/pow/exp/log/log10/log2/sin/cos/tan/asin/acos/atan/atan2/hypot/sign`, `Math.PI`, `Math.E`
   (there is no `**`: write `Math.pow`),
   `Object.keys/values/entries`, `Infinity`, `fade(colour, alpha)`.
+- **`fmt(x, digits?, compact:, sign:)`** writes a number as people read it: `fmt(1234567.5)` is
+  `1,234,567.5` (up to two decimals, trailing zeros dropped), `fmt(2, 2)` is `2.00`,
+  `fmt(8123456, compact: true)` is `8.1M` (k, M, B, T), `fmt(4.25, sign: true)` is `+4.25`. It
+  returns text: compute with the number, `fmt` it where it is shown.
 - **Lists and records never change.** `push`, `pop`, `shift`, `unshift`, `splice` are
   errors: build a new one, `xs = [...xs, x]`.
 - **Tone and style names are constants**, written bare: `neutral muted success warning
@@ -138,17 +144,43 @@ first, in the order shown, named after. An unknown named argument is a warning.
 | `grid(columns: 3) { }` | equal cells, wrapping |
 | `steps { step(n, title, status:, tone:, who:, phase:) { … } }` | a numbered timeline; `phase` labels the first step of each phase |
 
+**Charts** (return null; drawing them costs no steps, only computing their numbers does)
+
+```
+plot(x: [0, 300], y: [0, 100], height: 300, xLabel: "day", yLabel: "% of the city", log: "x") {
+  series("Infectious", days, infected, tone: danger, fill: true, width: 3)
+  dots("Measured", xs, ys, tone: warning, r: 3)
+  rule(y: 40, label: "S = 1/R₀")        // or rule(x: 45, …): a line across, with a note
+  point(45, 23, label: "peak")          // one marked point
+}
+bars([{label: "North", value: 42}, {label: "South", value: 31, tone: warning}], unit: "EUR")
+bars(harmonics, dir: "column", max: 1, height: 160)
+```
+
+| Call | Notes |
+|---|---|
+| `plot(x:, y:, height:, xLabel:, yLabel:, log:) { … }` | `x`, `y`: `[min, max]`, else they fit what is drawn; ticks are chosen and written with `fmt`. `log: "x" \| "y" \| "xy"`. `height` px, 220 by default. Two or more labelled series draw a legend |
+| `series(label, xs, ys, tone:, fill:, width:)` | a line through (`xs[i]`, `ys[i]`), 2,000 points at most; `fill: true` shades it down to the axis. Without a tone the series take accent, warning, success, danger, muted in turn. A point that is not a number breaks the line |
+| `dots(label, xs, ys, tone:, r:)` | points without a line |
+| `rule(x: \| y:, label:, tone:)` | a line across the plot at that value |
+| `point(x, y, label:, tone:)` | a marked point |
+| `bars(items, unit:, max:, dir:, height:)` | a bar per `{label, value, tone?}`, its value written with `fmt`; `dir: "column"` stands them up |
+
+`series`, `dots`, `rule` and `point` go only inside a `plot`. Drawing points is free: plot
+every one you compute rather than sampling to save steps.
+
 **Inputs** (return their value; identified by label, or `id:` when two share a label)
 
 | Call | Returns |
 |---|---|
 | `slider(label, min, max, value:, step:)` | the number (`min` by default). Use `step: 1` for whole numbers |
-| `choice(label, options, value:)` | the picked option (the first by default) |
+| `choice(label, options, value:, style:)` | the picked option (the first by default). `style: segmented` draws the options side by side in one outline, for a few short ones |
 | `input(label, value:, multiline:, placeholder:)` | the text |
 | `toggle(label, value:)` | `true` / `false` |
 | `checklist(label, options, value:)` | the ticked options (a list) |
 | `list(label, selectable:) { item(id, title, subtitle:, badge:, tone:) … }` | **`{selected, count}`**: the ticked item ids and how many items were drawn. Not a list |
 | `button(label, style: primary \| ghost \| danger, disabled:)` | **`{clicked}`**: true only in the run of its click |
+| `tabs(label, value:) { tab(title) { … } … }` | the title of the tab that shows (the first until one is picked). **Only that tab's block runs**, so what the others compute is not there: compute it before `tabs` |
 
 ## Effects
 
@@ -177,6 +209,14 @@ if step == 3 { text("Thanks, {value("Name")}") }   // an input's value, drawn or
 ```
 
 `set` runs only in a click's branch, as the effects do. State lasts while the document is open.
+
+**An input's value is the state named by its key**, so `set` moves an input and `value` reads
+one: a preset is a button that sets a slider.
+
+```
+let terms = slider("Terms", 1, 40, value: 5, step: 1)
+if button("Just the first").clicked { set("Terms", 1) }
+```
 
 ## Your own pieces: `fn` and `slot`
 
@@ -241,6 +281,9 @@ box(dir: "row", gap: 8, padding: [6, 10], radius: 8, background: raised, border:
 - **Not built yet:** `draw(w, h)` (bibmd does not draw it: use a box with a `layer`),
   `path`, `class:` and `styles:`, `theme:`, `borderLeft`, events on a box with `id`
   (`clicked`, `hovered`), `key()`, `tick`, `page.width`.
+- **Accepted but not drawn by bibmd yet** (no error, no effect): `shadow`, `hover`, `at`,
+  `scroll`; `align: end` and `justify: end`; a `width` of `fit` or `"50%"` (it fills); a
+  `height` of `fill`, `fit` or `"50%"` (it fits its children). Give sizes in px.
 
 ## Mistakes that recur
 
@@ -259,6 +302,9 @@ box(dir: "row", gap: 8, padding: [6, 10], radius: 8, background: raised, border:
 | a slider without `step:` meant for counts | `step: 1` |
 | `max(...xs)` | `max(xs)` |
 | `draw(240, 120) { … }` | `box(width: 240, height: 120) { layer { … } }` |
+| a row of buttons and `state` to pick one of a few | `choice(…, style: segmented)`; for panels of content, `tabs { tab(…) { … } }` |
+| a lambda that puts commas in thousands | `fmt(x)` |
+| a `box` with a `layer` of `line`s, `label`s and ticks for a curve | `plot { series(…) }`: a curve is one call, and its axes are drawn |
 | `slider("w(AA)", …)` and `slider("w(aa)", …)` | one input: labels and ids are compared without case, spaces or punctuation; give each an `id:` that differs in letters (`--check` warns) |
 | `min([w, 100])`, `w < 200`, `Math.sqrt(w)` in a layer | a box with a size in px, and that number |
 

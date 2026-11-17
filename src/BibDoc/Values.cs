@@ -72,20 +72,64 @@ public static class Values
         _ => double.NaN,
     };
 
+    /// <summary>
+    /// How far a list or record is followed when it is written out, as text or as JSON, and
+    /// compared: this many values, or characters of text. A list can hold another many times
+    /// over (xs = [xs, xs], again and again), so a small one can stand for an endless text.
+    /// </summary>
+    public const int ReadLimit = 1_000_000;
+
     public static string Str(object? v) => v switch
     {
         null => "null",
         bool b => b ? "true" : "false",
         double d => NumStr(d),
         string s => s,
-        List<object?> xs => string.Join(",", xs.Select(Str)),
-        Dictionary<string, object?> o => "{" + string.Join(", ", o.Select(kv => $"'{kv.Key}': {Repr(kv.Value)}")) + "}",
+        List<object?> or Dictionary<string, object?> => Written(v),
         Callable => "<function>",
         Dim d => $"{d.Axis}*{NumStr(d.K)}+{NumStr(d.C)}",
         _ => v.ToString() ?? "",
     };
 
-    private static string Repr(object? v) => v is string s ? $"'{s}'" : v is List<object?> xs ? "[" + string.Join(", ", xs.Select(Repr)) + "]" : Str(v);
+    // A list (its items joined by commas) or a record ({'k': v}) as text, cut with "…" at ReadLimit.
+    private static string Written(object? v)
+    {
+        var sb = new StringBuilder();
+        int left = ReadLimit;
+        if (!Write(sb, v, repr: false, ref left)) { sb.Length = Math.Min(sb.Length, ReadLimit); sb.Append('…'); }
+        return sb.ToString();
+    }
+
+    private static bool Write(StringBuilder sb, object? v, bool repr, ref int left)
+    {
+        if (--left < 0 || sb.Length > ReadLimit) return false;
+        switch (v)
+        {
+            case string s when repr: sb.Append('\'').Append(s).Append('\''); return true;
+            case List<object?> xs:
+                if (repr) sb.Append('[');
+                for (int i = 0; i < xs.Count; i++)
+                {
+                    if (i > 0) sb.Append(repr ? ", " : ",");
+                    if (!Write(sb, xs[i], repr, ref left)) return false;
+                }
+                if (repr) sb.Append(']');
+                return true;
+            case Dictionary<string, object?> o:
+                sb.Append('{');
+                bool first = true;
+                foreach (var (k, x) in o)
+                {
+                    if (!first) sb.Append(", ");
+                    first = false;
+                    sb.Append('\'').Append(k).Append("': ");
+                    if (!Write(sb, x, repr: true, ref left)) return false;
+                }
+                sb.Append('}');
+                return true;
+            default: sb.Append(Str(v)); return true;
+        }
+    }
 
     public static string NumStr(double d)
     {
@@ -95,9 +139,20 @@ public static class Values
         return d.ToString("R", CultureInfo.InvariantCulture);
     }
 
-    /// <summary>Equality by value: lists and records compare their contents.</summary>
+    /// <summary>
+    /// Equality by value: lists and records compare their contents. Two values that are not
+    /// told apart within <see cref="ReadLimit"/> values are taken as different.
+    /// </summary>
     public static bool Eq(object? x, object? y)
     {
+        long left = ReadLimit;
+        return Eq(x, y, ref left);
+    }
+
+    /// <summary>Equality by value, counting each value it looks at off <paramref name="left"/>; false when that runs out.</summary>
+    public static bool Eq(object? x, object? y, ref long left)
+    {
+        if (--left < 0) return false;
         if (x is bool || y is bool) return x is bool a && y is bool b && a == b;
         if (x is double dx && y is double dy) return dx == dy;
         if (x is null || y is null) return x is null && y is null;
@@ -105,17 +160,31 @@ public static class Values
         if (x is List<object?> lx && y is List<object?> ly)
         {
             if (lx.Count != ly.Count) return false;
-            for (int i = 0; i < lx.Count; i++) if (!Eq(lx[i], ly[i])) return false;
+            for (int i = 0; i < lx.Count; i++) if (!Eq(lx[i], ly[i], ref left)) return false;
             return true;
         }
         if (x is Dictionary<string, object?> ox && y is Dictionary<string, object?> oy)
-            return ox.Count == oy.Count && ox.All(kv => oy.TryGetValue(kv.Key, out var w) && Eq(kv.Value, w));
+        {
+            if (ox.Count != oy.Count) return false;
+            foreach (var (k, v) in ox) if (!oy.TryGetValue(k, out var w) || !Eq(v, w, ref left)) return false;
+            return true;
+        }
         return ReferenceEquals(x, y);
     }
 
-    /// <summary>A value as JSON: what frames and effects are compared and archived as.</summary>
+    /// <summary>
+    /// A value as JSON: what frames and effects are compared and archived as. A value past
+    /// <see cref="ReadLimit"/> is cut short with "…", which is no longer JSON.
+    /// </summary>
     public static void WriteJson(StringBuilder sb, object? v)
     {
+        int left = ReadLimit;
+        if (!WriteJson(sb, v, sb.Length + ReadLimit, ref left)) sb.Append('…');
+    }
+
+    private static bool WriteJson(StringBuilder sb, object? v, int end, ref int left)
+    {
+        if (--left < 0 || sb.Length > end) return false;
         switch (v)
         {
             case null: sb.Append("null"); break;
@@ -128,7 +197,11 @@ public static class Values
             case string s: WriteString(sb, s); break;
             case List<object?> xs:
                 sb.Append('[');
-                for (int i = 0; i < xs.Count; i++) { if (i > 0) sb.Append(','); WriteJson(sb, xs[i]); }
+                for (int i = 0; i < xs.Count; i++)
+                {
+                    if (i > 0) sb.Append(',');
+                    if (!WriteJson(sb, xs[i], end, ref left)) return false;
+                }
                 sb.Append(']');
                 break;
             case Dictionary<string, object?> o:
@@ -138,12 +211,14 @@ public static class Values
                 {
                     if (!first) sb.Append(',');
                     first = false;
-                    WriteString(sb, k); sb.Append(':'); WriteJson(sb, x);
+                    WriteString(sb, k); sb.Append(':');
+                    if (!WriteJson(sb, x, end, ref left)) return false;
                 }
                 sb.Append('}');
                 break;
             default: WriteString(sb, Str(v)); break;
         }
+        return true;
     }
 
     private static void WriteString(StringBuilder sb, string s)
